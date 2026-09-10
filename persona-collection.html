@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="fO4KGYA7xUbTwpU0IXGqcn">
+<head data-page-node-id="WizsoK1QJdVP5OhRwhDDO2">
+<meta charset="UTF-8" data-page-node-id="IQxEsEGiwBzbuC1IBfquRB">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="cEQklMC9YRpJwba0RBP7wy">
+<title>人格营销测验 · 合集版</title>
+<style>
+  :root{
+    --navy:#142A40; --teal:#24A69E; --orange:#F29A49;
+    --grey:#738796; --line:#DCE8E8; --panel:#EAF7F4; --ink:#1F2D3A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Microsoft YaHei","微软雅黑","Segoe UI Emoji","Apple Color Emoji",-apple-system,sans-serif;
+    background:#fff;color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 28px}
+
+  .hero{padding:56px 0 30px;border-bottom:1px solid var(--line)}
+  .kicker{font-size:12px;letter-spacing:.16em;color:var(--teal);font-weight:700;margin-bottom:12px}
+  h1{font-size:30px;line-height:1.3;color:var(--navy);font-weight:700;margin-bottom:12px}
+  .sub{font-size:14px;color:var(--grey);max-width:640px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;padding:22px 0;position:sticky;top:0;background:#fff;z-index:5;border-bottom:1px solid var(--line)}
+  .tabs button{font-family:inherit;font-size:13px;cursor:pointer;background:#fff;border:1px solid var(--line);color:var(--grey);padding:8px 16px;border-radius:2px;transition:.15s}
+  .tabs button:hover{border-color:var(--teal);color:var(--teal)}
+  .tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  .stage{padding:34px 0 60px;min-height:420px}
+
+  .qhead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .badge{flex:none;width:30px;height:30px;border-radius:2px;background:var(--navy);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .qhead h2{font-size:20px;color:var(--navy);font-weight:700}
+  .qnote{font-size:13px;color:var(--grey);margin:0 0 20px 42px}
+
+  .refbox{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:14px 16px;margin:0 0 20px 42px;font-size:12.5px;color:var(--grey)}
+  .refbox div + div{margin-top:4px}
+  .refbox b{color:var(--teal);font-weight:700}
+
+  .btn{font-family:inherit;font-size:14px;cursor:pointer;background:var(--navy);color:#fff;border:none;padding:11px 26px;border-radius:2px;transition:.15s}
+  .btn:hover{background:var(--teal)}
+  .btn.ghost{background:#fff;color:var(--grey);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--teal);color:var(--teal);background:#fff}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+  .hint{font-size:12.5px;color:var(--grey);margin-bottom:16px}
+
+  /* emoji 选择器 */
+  .egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+  .eitem{
+    font-family:inherit;text-align:center;cursor:pointer;
+    background:#fff;border:1px solid var(--line);border-radius:3px;
+    padding:16px 8px 12px;transition:.15s;
+  }
+  .eitem:hover{border-color:var(--teal);background:var(--panel)}
+  .eitem.sel{background:var(--teal);border-color:var(--teal)}
+  .eitem .em{display:block;font-size:38px;line-height:1.25}
+  .eitem .nm{display:block;font-size:12px;color:var(--grey);margin-top:6px}
+  .eitem.sel .nm{color:#fff}
+
+  /* 会议室 */
+  .room{position:relative;height:360px;border:1px solid var(--line);border-radius:3px;background:#fff;margin-bottom:8px}
+  .table{position:absolute;left:50%;top:100px;width:56%;height:150px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--grey);letter-spacing:.1em}
+  .seat{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--grey);font-size:13px;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit}
+  .seat:hover{border-color:var(--teal);color:var(--teal);background:var(--panel)}
+  .seat.boss{background:var(--navy);border-color:var(--navy);color:#fff;cursor:default}
+  .seat.boss:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .seat.sel{background:var(--teal);border-color:var(--teal);color:#fff}
+
+  /* 结果卡 */
+  .result{border:1px solid var(--line);border-radius:3px;padding:26px 26px 22px;background:#fff}
+  .rtype{font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.1em;margin-bottom:8px}
+  .rname{font-size:26px;color:var(--navy);font-weight:700;margin-bottom:6px;line-height:1.3}
+  .rpick{font-size:34px;margin-bottom:10px;line-height:1.2}
+  .rline{font-size:15px;color:var(--grey);font-style:italic;margin-bottom:16px}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .chip{font-size:12px;color:var(--teal);border:1px solid var(--line);background:var(--panel);padding:4px 11px;border-radius:2px}
+  .blind{font-size:13px;color:var(--grey);margin-bottom:16px}
+  .copy{background:var(--panel);border-left:2px solid var(--orange);padding:12px 14px;font-size:13.5px;color:var(--ink);margin-bottom:20px}
+  .copy b{display:block;color:var(--orange);font-size:11px;letter-spacing:.06em;margin-bottom:4px}
+
+  .band{background:var(--navy);color:#fff;padding:24px 0}
+  .band p{font-size:12.5px;color:#C8D6DF;max-width:780px}
+  .band p + p{margin-top:7px}
+
+  @media (max-width:720px){
+    .wrap{padding:0 18px}
+    h1{font-size:24px}
+    .refbox,.qnote{margin-left:0}
+    .room{height:320px}
+    .egrid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+  }
+  .btn:disabled{opacity:.45;cursor:default}
+  .rstats{font-size:13px;color:var(--grey);background:var(--panel);border:1px solid var(--line);padding:10px 12px;border-radius:2px;margin-bottom:14px}
+  .rstats b{color:var(--navy)}
+
+  /* 气球 */
+  .bl{display:flex;flex-direction:column;align-items:center;padding:10px 0 4px}
+  .blslot{height:180px;display:flex;align-items:flex-end;justify-content:center}
+  .balloon{width:92px;height:112px;background:linear-gradient(160deg,#24A69E,#4FC3B8);border-radius:50% 50% 50% 50%/58% 58% 42% 42%;transition:transform .18s ease,background .2s;position:relative;transform-origin:bottom center}
+  .balloon:after{content:"";position:absolute;left:50%;bottom:-16px;width:1px;height:18px;background:var(--grey);transform:translateX(-50%)}
+  .balloon.pop{background:#DCDCDC;transform:scale(.9)!important}
+  .pumps{font-size:13px;color:var(--grey);margin-top:26px}
+  .blrow{display:flex;gap:10px;margin-top:12px}
+  .bstat{display:flex;gap:16px;font-size:13px;color:var(--grey);margin-top:18px}
+  .bstat b{color:var(--navy)}
+
+  /* 抛球 */
+  .cb{position:relative;height:300px;margin:18px 0 10px}
+  .pl{position:absolute;width:88px;text-align:center;transform:translate(-50%,-50%);transition:left .45s ease,top .45s ease}
+  .think{font-size:13px;color:var(--teal);height:16px;letter-spacing:.12em}
+  .av{width:64px;height:64px;margin:0 auto;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;transition:.15s}
+  .pl.me .av{border-color:var(--navy)}
+  .pl.has .av{border-color:var(--teal);background:var(--panel);transform:scale(1.06)}
+  .nm2{font-size:12px;color:var(--grey);margin-top:7px}
+  .ball{font-size:15px;height:18px;margin-top:3px}
+  .cbstat{font-size:13px;color:var(--grey);text-align:center;margin-bottom:6px;min-height:22px}
+  .cbstat b{color:var(--navy)}
+  .hint{font-size:13px;color:var(--navy);text-align:center;margin-top:10px}
+  .hint b{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 7px}
+  .pl.pick{cursor:pointer}
+  .pl.pick .av{box-shadow:0 0 0 3px rgba(36,166,158,.9);animation:cbpulse 1.1s ease-in-out infinite}
+  .pl.pick:hover .av{transform:scale(1.08)}
+  @keyframes cbpulse{0%,100%{box-shadow:0 0 0 3px rgba(36,166,158,.9)}50%{box-shadow:0 0 0 8px rgba(36,166,158,0)}}
+
+  @media print{.tabs{display:none}}
+</style>
+</head>
+<body data-page-node-id="2IS0x9OoLnWqJICHinehE0">
+
+<div class="wrap" data-page-node-id="zAHnY0jFESrZWQXjyBqWvW">
+  <header class="hero" data-page-node-id="ZF0vdksdzJ8vcvZgFvGg9K">
+    <div class="kicker" data-page-node-id="fej6DcvhhbAxUfQZMj54gk">PERSONALITY MARKETING · 合集</div>
+    <h1 data-page-node-id="DR9ookiZHADHBrdGCbeVK5">人格营销测验 · 合集版</h1>
+    <p class="sub" data-page-node-id="M9qIeHKt525nDGi5YHAcNj">六个小实验：A–D 靠直觉选图（emoji / 椅子），E 气球测风险偏好，F 抛球测被排斥后的反应。全部本地运行，不采集数据。</p>
+  </header>
+
+  <nav class="tabs" id="tabs" data-page-node-id="TIuETSSwlaiKrghuEBDoRI">
+    <button class="on" data-q="A" data-page-node-id="6g18GA5VXnEOTMVfO3TUvh">A 听什么</button>
+    <button data-q="B" data-page-node-id="S1c83lDzNLHtk34ry74pIP">B 选椅子</button>
+    <button data-q="C" data-page-node-id="qEmzt5eoFfjC1sNTl57CZB">C 猫猫狗狗</button>
+    <button data-q="D" data-page-node-id="bWkE69WREWu7LECEofjwG0">D 吃什么</button>
+    <button data-q="E">E 打气球</button>
+    <button data-q="F">F 抛球</button>
+  </nav>
+
+  <main class="stage" id="stage" data-page-node-id="qzPVi1FmiuvRE3Dk2h9pdJ"></main>
+</div>
+
+<footer class="band" data-page-node-id="LAqCLKp7VtF8xVFTAo5qif">
+  <div class="wrap" data-page-node-id="QEIWIg38PZ94LH8d4Aoe1v">
+    <p data-page-node-id="2gHUSyz6bN0eD3PHmhbuRs">娱乐向视觉投射小测验，趣味性优先，结果不构成心理诊断或人格评估。</p>
+    <p data-page-node-id="N5V6XHqAMXInnJfEFIcCTB">A–D 参考《人格营销清单.md》；E 为 BART 气球风险任务、F 为 Cyberball 抛球范式的简化演示。不收集任何数据，全程在浏览器本地完成。</p>
+  </div>
+</footer>
+
+<script>
+/* ============ 数据 ============ */
+var DATA = {
+
+  /* ---------- A 音频：选一个声音 ---------- */
+  A: {
+    badge:'A', name:'你是什么音乐人格', kind:'grid',
+    note:'下面这些声音 / 乐器，凭直觉抓一个——它比较像你。',
+    ref:[['机制','听歌偏好 / 乐器联想 → 生成音乐性格标签。'],
+         ['平台','网易云 / Spotify / 抖音'],
+         ['营销落点','年度报告的仪式感，每年固定的刷屏节点。']],
+    items:[
+      {em:'🎧', nm:'耳机',   k:'headphone'},
+      {em:'🎸', nm:'吉他',   k:'guitar'},
+      {em:'🎹', nm:'钢琴',   k:'piano'},
+      {em:'🎤', nm:'麦克风', k:'mic'},
+      {em:'🎻', nm:'小提琴', k:'violin'},
+      {em:'🎷', nm:'萨克斯', k:'sax'},
+      {em:'🥁', nm:'鼓',     k:'drum'},
+      {em:'📻', nm:'收音机', k:'radio'}
+    ],
+    results:{
+      headphone:{name:'沉浸独处型', line:'我的世界自带背景音乐。', tags:['专注','有边界','自给自足'], blind:'容易活在自己世界里，漏掉外面的事。', copy:'耳机一戴，谁也不爱——我是沉浸独处型。'},
+      guitar:{name:'随性表达型', line:'想到就弹，别管好不好听。', tags:['随性','直接','有感染力'], blind:'计划性差，容易三分钟热度。', copy:'吉他型：先爽了再说，细节以后再补。'},
+      piano:{name:'结构讲究型', line:'每个音都该在它该在的位置。', tags:['严谨','有条理','追求准'], blind:'太较真，自己和别人都累。', copy:'钢琴型：不是强迫症，是心里有谱。'},
+      mic:{name:'外向释放型', line:'有话要说，还要说得响。', tags:['外放','感染力强','不怕被看见'], blind:'容易抢话，顾不上别人的节奏。', copy:'麦克风型：给我一个话题，我能讲一晚上。'},
+      violin:{name:'细腻内敛型', line:'情绪都藏在弦里。', tags:['敏感','细腻','有层次'], blind:'心事重，不太说得出口。', copy:'小提琴型：我不说，但我都记得。'},
+      sax:{name:'慵懒氛围型', line:'慢一点，才有味道。', tags:['松弛','有氛围感','不急'], blind:'容易拖，关键时刻提不起劲。', copy:'萨克斯型：人生要有 BGM，而且得慢。'},
+      drum:{name:'节奏驱动型', line:'跟不上的，自己调整。', tags:['行动快','有冲劲','带动气氛'], blind:'太急，容易漏掉细节。', copy:'鼓点型：先跑起来，节奏自己会跟上。'},
+      radio:{name:'念旧频道型', line:'老歌比新歌懂我。', tags:['念旧','长情','有故事'], blind:'抗拒新东西，容易停在原地。', copy:'收音机型：我的歌单停在十年前，挺好的。'}
+    }
+  },
+
+  /* ---------- B 会议室选椅子 ---------- */
+  B: {
+    badge:'B', name:'办公室椅子测验', kind:'chair',
+    note:'推门进会议室，老板已经坐在主持位。凭直觉选一把椅子坐下。',
+    ref:[['机制','一张会议室图、几把椅子，凭直觉选一把，揭示职场人格。'],
+         ['平台','小红书图文 + 微博转发'],
+         ['营销落点','零开发成本的图文模板，品牌换图换椅子就能蹭。']],
+    seats:[
+      {id:1, l:'33%', t:42,  k:'advisor'},
+      {id:2, l:'67%', t:42,  k:'core'},
+      {id:3, l:'10%', t:145, k:'pragmatic'},
+      {id:4, l:'90%', t:145, k:'observer'},
+      {id:5, l:'10%', t:215, k:'quiet'},
+      {id:6, l:'90%', t:215, k:'vibe'},
+      {id:7, l:'50%', t:295, k:'frontal'},
+      {id:8, l:'12%', t:320, k:'lone'},
+      {id:9, l:'88%', t:320, k:'exit'}
+    ],
+    results:{
+      advisor:{name:'幕后军师型', line:'我不抢话，但方案基本是我写的。', tags:['稳','想得深','不抢功'], blind:'功劳容易被忽略，存在感靠结果撑。', copy:'老板左手边那位，才是真正写 PPT 的人——是我。'},
+      core:{name:'核心圈型', line:'重要的事，得有人在旁边。', tags:['可靠','懂配合','存在感强'], blind:'容易被贴上「老板的人」的标签。', copy:'近水楼台，我坐这儿有安全感。'},
+      pragmatic:{name:'务实中间派', line:'怎么快怎么来，别绕。', tags:['讲效率','好说话','能落地'], blind:'少表态，容易被两边都当成自己人。', copy:'中间派不是没主见，是不想把时间浪费在站位上。'},
+      observer:{name:'观察记录型', line:'先听完，我再说。', tags:['冷静','看全局','话不多'], blind:'不开口的时候，容易被当成没想法。', copy:'我不是没意见，我只是在等你们说完。'},
+      quiet:{name:'安静执行型', line:'活干完就行，别cue我。', tags:['靠谱','低调','不添乱'], blind:'存在感偏低，好事容易轮不到。', copy:'坐角落的人，往往才是把活干完的人。'},
+      vibe:{name:'气氛调节型', line:'别太严肃，笑一下。', tags:['亲和','会缓和','人缘好'], blind:'关键时刻容易被认为不够严肃。', copy:'会议室总需要一个会开玩笑的人，就是我。'},
+      frontal:{name:'正面接招型', line:'有话直说，别绕弯子。', tags:['直接','敢担责','不怕冲突'], blind:'容易显得咄咄逼人，让人有压力。', copy:'我选了正对老板的位置——果然是我。'},
+      lone:{name:'边缘独狼型', line:'会开完我就走。', tags:['独立','有边界','不社交'], blind:'信息容易滞后，错过关键上下文。', copy:'靠窗那位，心思早飞出去了——是我。'},
+      exit:{name:'随时撤退型', line:'门在哪，我坐哪。', tags:['警觉','务实','重效率'], blind:'看起来投入度不足，容易被误会。', copy:'离门最近的位置，是我的本命。'}
+    }
+  },
+
+  /* ---------- C 猫猫狗狗 ---------- */
+  C: {
+    badge:'C', name:'你是猫系还是狗系', kind:'grid',
+    note:'猫和狗混在一起，凭直觉抱走一只——它比较像你。',
+    ref:[['机制','拟动物情境 + 直觉选择 → 匹配动物人格。'],
+         ['平台','微信 / 小红书 / 抖音'],
+         ['营销落点','宠物用品、猫咖、狗粮；萌图天然可晒。']],
+    items:[
+      {em:'😻', nm:'花痴猫', k:'crush'},
+      {em:'😼', nm:'得意猫', k:'smug'},
+      {em:'🙀', nm:'惊恐猫', k:'alert'},
+      {em:'😿', nm:'哭猫',   k:'tender'},
+      {em:'🐶', nm:'小狗',   k:'puppy'},
+      {em:'🐕', nm:'大狗',   k:'loyal'},
+      {em:'🐩', nm:'贵宾',   k:'fancy'},
+      {em:'🐺', nm:'狼',     k:'wolf'}
+    ],
+    results:{
+      crush:{name:'黏人撒娇型', line:'你在哪儿，我在哪儿。', tags:['温柔','黏人','好说话'], blind:'太在意别人，不太会拒绝。', copy:'花痴猫：不是没主见，是舍不得让你不开心。'},
+      smug:{name:'高冷自信型', line:'我知道我好看。', tags:['自信','有主见','不讨好'], blind:'显得有点傲，别人不好靠近。', copy:'得意猫：自信不是我的错。'},
+      alert:{name:'敏感警觉型', line:'先让我确认一下安全。', tags:['警觉','观察力强','想得深'], blind:'容易过度紧张，耗自己。', copy:'惊恐猫：我不是胆小，我是在评估风险。'},
+      tender:{name:'情绪细腻型', line:'我容易共情到自己也难过。', tags:['共情','柔软','重感情'], blind:'情绪消耗大，不太会卸下来。', copy:'哭猫：看个广告我都能红眼眶，别笑我。'},
+      puppy:{name:'热情直球型', line:'我喜欢你，尾巴会摇。', tags:['热情','直接','不记仇'], blind:'太掏心，容易受伤。', copy:'小狗型：我的喜欢都写在脸上。'},
+      loyal:{name:'忠诚稳重型', line:'你回来，我就在门口。', tags:['可靠','长情','有担当'], blind:'偏固执，不太愿意改变。', copy:'大狗型：认定了就是一辈子。'},
+      fancy:{name:'精致讲究型', line:'细节不到位我会难受。', tags:['讲究','有品位','要体面'], blind:'容易显得挑剔，让人有压力。', copy:'贵宾型：不是矫情，是不想将就。'},
+      wolf:{name:'独立独狼型', line:'我自己能搞定。', tags:['独立','有边界','不依赖'], blind:'不容易开口求助，习惯硬扛。', copy:'狼型：能自己解决的事，就不麻烦人。'}
+    }
+  },
+
+  /* ---------- D 吃什么 ---------- */
+  D: {
+    badge:'D', name:'你是哪种食物人格', kind:'grid',
+    note:'饿了。下面这些，凭直觉端走一份——它比较像你。',
+    ref:[['机制','口味偏好 → 匹配一种「专属食物」人格。'],
+         ['平台','小红书 + 点单晒卡'],
+         ['营销落点','餐饮 / 生鲜品牌，测完顺手下一单。']],
+    items:[
+      {em:'🍜', nm:'拉面', k:'ramen'},
+      {em:'🍕', nm:'披萨', k:'pizza'},
+      {em:'🍣', nm:'寿司', k:'sushi'},
+      {em:'🌶️', nm:'辣椒', k:'chili'},
+      {em:'🍰', nm:'蛋糕', k:'cake'},
+      {em:'🥗', nm:'沙拉', k:'salad'},
+      {em:'🍔', nm:'汉堡', k:'burger'},
+      {em:'🍵', nm:'茶',   k:'tea'}
+    ],
+    results:{
+      ramen:{name:'温热踏实型', line:'一碗热的就能活过来。', tags:['实在','念旧','重安慰'], blind:'容易原地打转，不太敢换赛道。', copy:'拉面型：治愈我的从来不是大道理，是一碗热的。'},
+      pizza:{name:'热闹分享型', line:'好东西要分着吃。', tags:['外向','慷慨','爱热闹'], blind:'顾着别人，容易忽略自己。', copy:'披萨型：一个人吃没意思，得叫人。'},
+      sushi:{name:'克制讲究型', line:'少一点，但每一点都要对。', tags:['克制','有标准','重质感'], blind:'标准高，容易显得挑剔。', copy:'寿司型：宁可少，不要将就。'},
+      chili:{name:'直接带刺型', line:'要么别吃，要么就辣到底。', tags:['直接','有棱角','不装'], blind:'容易伤人而不自知。', copy:'辣椒型：我不是故意刺你，我本来就是这个味。'},
+      cake:{name:'甜系治愈型', line:'不开心就吃点甜的。', tags:['柔软','会安慰人','重氛围'], blind:'容易用甜头躲开真正的问题。', copy:'蛋糕型：生活已经够苦了，甜一点怎么了。'},
+      salad:{name:'清爽自律型', line:'我知道什么对我好。', tags:['自律','清醒','有节制'], blind:'过得太紧，偶尔该松一松。', copy:'沙拉型：不是苦行，是我自己选的。'},
+      burger:{name:'实在管饱型', line:'别整虚的，能顶事就行。', tags:['务实','高效','不矫情'], blind:'容易忽略细节和仪式感。', copy:'汉堡型：花里胡哨，不如实在管用。'},
+      tea:{name:'慢热回甘型', line:'第一口苦，后面是回甘。', tags:['慢热','有层次','耐处'], blind:'初识容易被误解成冷淡。', copy:'茶型：急不来，越处越有味道。'}
+    }
+  },
+  E: {
+    badge:'E', name:'气球风险测验', kind:'balloon',
+    note:'5 个气球。每打一次气都可能加分，也可能直接爆掉——爆了这一轮的分全没了。你随时可以「收下」落袋为安。',
+    ref:[['机制','BART 气球模拟风险任务：每打一次气，收益变高、爆掉概率也变高，用来测真实风险偏好。'],
+         ['平台','实验室范式 / H5 小游戏'],
+         ['营销落点','结果自带「我敢撑到第几下」的谈资，适合理财、投资、运动、保险向。']],
+    trials:5,
+    results:{
+      safe:{name:'落袋为安型', line:'能拿走的就先拿走，别贪。', tags:['保守','稳','厌恶损失'], blind:'容易错过本来还能再拿一截的部分。', copy:'气球我只打三下——落袋为安型。'},
+      steady:{name:'稳健保守型', line:'看到风险就收手，不丢人。', tags:['谨慎','有分寸','不冒进'], blind:'偏保守，机会来了下手会慢半拍。', copy:'稳健保守型：我不是不敢，是我算过。'},
+      balance:{name:'平衡试探型', line:'先探到边界，再决定收不收。', tags:['会试探','有判断','能收手'], blind:'偶尔高估自己的刹车能力。', copy:'平衡试探型：我不是赌，我是探底。'},
+      risk:{name:'风险偏好型', line:'不撑到后头，怎么知道上限在哪。', tags:['敢赌','追高','不怕爆'], blind:'爆掉的次数说明收手点偏晚。', copy:'风险偏好型：爆了就爆了，下一轮再来。'},
+      wild:{name:'激进冒进型', line:'停不下来，这件事本身就说明问题。', tags:['冲动','高频','停不住'], blind:'爆球率明显偏高，收益没跟上冒险。', copy:'激进冒进型：我知道会爆，但手不听话。'}
+    }
+  },
+  F: {
+    badge:'F', name:'抛球游戏 · 排斥与接纳', kind:'cyber',
+    note:'三个人在线上抛球。中途他们会突然不传给你——这不是你操作错了，是设计好的。之后新人小C加入，球回到你手上，由你决定传给谁。',
+    ref:[['机制','Cyberball 范式：先接纳、再短暂排斥，看被排斥后的行为倾向（是否回避、是否照顾更弱的人）。'],
+         ['平台','实验室范式（fMRI 常用）/ H5'],
+         ['营销落点','情绪冲击强、结果有故事感，适合社交、心理健康、反霸凌向内容。']],
+    results:{
+      care:{name:'关注弱小型', line:'你一眼就看到被晾着的小C，主动把球递过去。', tags:['照顾人','护弱','有记性'], blind:'容易为了照顾别人把自己排在后面；不快也可能压着不说。', copy:'关注弱小型：谁被晾着，我先看谁——至于晾过我的，我也没忘。'},
+      forgive:{name:'宽容型', line:'被晾了几回，你还是把球传给之前冷落你的人，没打算让气氛继续坏下去。', tags:['不记仇','大度','重气氛'], blind:'可能把委屈先咽下去，事后才慢慢反刍。', copy:'宽容型：那几分钟，我没打算记着。'},
+      ledger:{name:'记仇型', line:'谁传你，你就传谁——一本账清清楚楚，谁冷落过你也一直记着。', tags:['对等','记仇','有数'], blind:'太在意「谁欠谁」容易把关系算成账本，反而难松弛。', copy:'记仇型：谁传给我，我传给谁——我不是忘了，我是有数。'},
+      turn:{name:'轮着玩型', line:'你挨个轮着传，谁都不得罪也不得宠，节奏平稳。', tags:['均衡','轮流','公平'], blind:'太平均反而显得没偏好，关键时刻不容易被记住。', copy:'轮着玩型：一人一下，谁也别抢戏。'},
+      careless:{name:'无所谓型', line:'你不太在意谁传谁，随手就抛，情绪没起什么波澜。', tags:['无所谓','随性','无波动'], blind:'不波动也意味着少参与，关系里容易像个旁观者。', copy:'无所谓型：传谁不是传，开心就行。'}
+    }
+  }
+};
+
+/* ============ 渲染 ============ */
+var ST = {};
+var stage = document.getElementById('stage');
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+function refBox(d){
+  if(!d.ref) return '';
+  return '<div class="refbox">' + d.ref.map(function(r){
+    return '<div><b>' + esc(r[0]) + '</b> · ' + esc(r[1]) + '</div>';
+  }).join('') + '</div>';
+}
+function head(d){
+  return '<div class="qhead"><div class="badge">' + d.badge + '</div><h2>' + esc(d.name) + '</h2></div>' +
+         '<p class="qnote">' + esc(d.note) + '</p>' + refBox(d);
+}
+
+/* --- emoji 网格 --- */
+function renderGrid(id){
+  var d = DATA[id];
+  stage.innerHTML = head(d) +
+    '<p class="hint">点一个你直觉想选的（没有对错，别想太久）。</p>' +
+    '<div class="egrid">' + d.items.map(function(it){
+      return '<button class="eitem" data-k="' + it.k + '">' +
+             '<span class="em">' + it.em + '</span><span class="nm">' + esc(it.nm) + '</span></button>';
+    }).join('') + '</div>';
+  [].forEach.call(stage.querySelectorAll('.eitem'), function(b){
+    b.onclick = function(){
+      b.classList.add('sel');
+      var em = b.querySelector('.em').textContent;
+      setTimeout(function(){ showResult(id, b.dataset.k, em); }, 200);
+    };
+  });
+}
+
+/* --- 会议室 --- */
+function renderChair(id){
+  var d = DATA[id];
+  var seats = d.seats.map(function(se){
+    return '<button class="seat" data-k="' + se.k + '" style="left:' + se.l + ';top:' + se.t + 'px">' + se.id + '</button>';
+  }).join('');
+  stage.innerHTML = head(d) +
+    '<p class="hint">点一把椅子坐下（① 最靠近主持位，⑦ 正对老板，⑧ 靠窗，⑨ 靠门）。</p>' +
+    '<div class="room">' +
+      '<div class="table">会议桌</div>' +
+      '<button class="seat boss" style="left:50%;top:42px">主</button>' +
+      seats +
+    '</div>';
+  [].forEach.call(stage.querySelectorAll('.seat:not(.boss)'), function(b){
+    b.onclick = function(){
+      b.classList.add('sel');
+      setTimeout(function(){ showResult(id, b.dataset.k, ''); }, 220);
+    };
+  });
+}
+
+/* --- 气球风险测验（BART 简化版） --- */
+var BL=null;
+function roll(){return 4+Math.floor(Math.random()*17);}
+function renderBalloon(id){
+  var d=DATA[id];
+  BL={id:id,i:0,pumps:0,temp:0,total:0,pops:0,sumPumps:0,popAt:roll()};
+  stage.innerHTML=head(d)+
+    '<div class="bl"><div class="blslot"><div class="balloon" id="bl"></div></div>'+
+    '<div class="pumps" id="blp"></div>'+
+    '<div class="blrow"><button class="btn ghost" id="bank">收下得分</button></div>'+
+    '<div class="hint" id="blhint">按 <b>空格键</b> 给气球打气</div>'+
+    '<div class="bstat" id="bls"></div></div>';
+  blPaint();
+  document.getElementById('bank').onclick=blBank;
+}
+function blLock(v){document.getElementById('bank').disabled=v;}
+function blPaint(){
+  var sc=Math.min(1.22, 1+BL.pumps*0.016);
+  document.getElementById('bl').style.transform='scale('+sc+')';
+  document.getElementById('blp').textContent='本轮已打气 '+BL.pumps+' 次 · 当前可收 '+BL.temp+' 分';
+  document.getElementById('bls').innerHTML='第 '+(BL.i+1)+'/'+DATA[BL.id].trials+' 个气球 · 总分 <b>'+BL.total+'</b> · 已爆 <b>'+BL.pops+'</b>';
+}
+function blPump(){
+  BL.pumps++;BL.sumPumps++;BL.temp+=2;
+  if(BL.pumps>=BL.popAt){
+    BL.pops++;
+    document.getElementById('bl').classList.add('pop');
+    document.getElementById('blp').textContent='爆了！这轮 '+BL.temp+' 分没了';
+    document.getElementById('bls').innerHTML='第 '+(BL.i+1)+'/'+DATA[BL.id].trials+' 个气球 · 总分 <b>'+BL.total+'</b> · 已爆 <b>'+BL.pops+'</b>';
+    blLock(true);setTimeout(blNext,1100);return;
+  }
+  blPaint();
+}
+function blBank(){
+  BL.total+=BL.temp;
+  document.getElementById('blp').textContent='收下 '+BL.temp+' 分';
+  document.getElementById('bank').blur();
+  blLock(true);setTimeout(blNext,700);
+}
+function blNext(){
+  BL.i++;BL.temp=0;BL.pumps=0;BL.popAt=roll();
+  if(BL.i>=DATA[BL.id].trials){blFinish();return;}
+  document.getElementById('bl').classList.remove('pop');
+  blLock(false);blPaint();
+}
+function blFinish(){
+  var d=DATA[BL.id],avg=BL.sumPumps/d.trials;
+  var key=avg<=3?'safe':avg<=6?'steady':avg<=10?'balance':avg<=14?'risk':'wild';
+  if(BL.pops>=3&&(key==='balance'||key==='risk'))key=(key==='balance')?'risk':'wild';
+  var stats='总分 <b>'+BL.total+'</b> 分 · 爆掉 <b>'+BL.pops+'/'+d.trials+'</b> · 平均打气 <b>'+avg.toFixed(1)+'</b> 次';
+  showResult(BL.id,key,'',stats);
+}
+
+/* --- 抛球游戏（Cyberball 简化版） --- */
+var CB=null;
+function cbPos(id){
+  if(!CB.hasC){
+    var a={A:[22,14],B:[78,14],me:[50,80]};   // 倒三角：用户在底部
+    return a[id];
+  }
+  var b={A:[18,16],B:[82,16],C:[18,82],me:[82,82]};  // 四人：正方形四角
+  return b[id];
+}
+function cbPlayers(){
+  var p=[{id:'me',em:'🙋',nm:'你'},{id:'A',em:'🐨',nm:'小A'},{id:'B',em:'🐰',nm:'小B'}];
+  if(CB.hasC)p.push({id:'C',em:'🐣',nm:'小C'});
+  return p;
+}
+function cbPaint(){
+  var ps=cbPlayers();
+  document.getElementById('cb').innerHTML=ps.map(function(p){
+    var pos=cbPos(p.id);
+    var pick=CB.choice&&CB.choice.ids.indexOf(p.id)>=0;
+    return '<div class="pl'+(p.id==='me'?' me':'')+(CB.holder===p.id?' has':'')+(pick?' pick':'')+'" '+
+      'style="left:'+pos[0]+'%;top:'+pos[1]+'%"'+(pick?' data-pick="'+p.id+'"':'')+'>'+
+      '<div class="av">'+p.em+'</div><div class="nm2">'+esc(p.nm)+'</div>'+
+      '<div class="ball">'+(CB.holder===p.id?'⚽':'')+'</div>'+
+      '<div class="think">'+(CB.think===p.id?'···':'')+'</div></div>';
+  }).join('');
+  if(CB.choice){
+    [].forEach.call(document.querySelectorAll('#cb .pl.pick'),function(el){
+      el.onclick=function(){
+        var t=el.dataset.pick, f=CB.choice.fn;
+        CB.choice=null; cbAct(''); cbPaint();
+        f(t);
+      };
+    });
+  }
+}
+function cbStat(t){document.getElementById('cbstat').innerHTML=t;}
+function cbAct(h){document.getElementById('cbact').innerHTML=h;}
+function cbAsk(ids,fn){
+  CB.choice={ids:ids,fn:fn};
+  cbAct('<div class="hint">点击你想传球的头像</div>');
+  cbPaint();
+}
+/* 电脑抛球：先停顿 1 秒（显示「···」），再出手，避免机械感 */
+function aiThrow(to,fn){
+  CB.think=CB.holder;cbPaint();
+  setTimeout(function(){
+    CB.think=null;CB.holder=to;cbPaint();
+    setTimeout(fn, 300+Math.random()*220);
+  }, 500);   // 抛球前电脑停顿 0.5 秒
+}
+function renderCyber(id){
+  var d=DATA[id];
+  CB={id:id,phase:1,holder:'A',think:null,p3:{A:0,B:0,C:0},mirror:0,hasC:false};
+  stage.innerHTML=head(d)+
+    '<div class="cbstat" id="cbstat"></div><div class="cb" id="cb"></div>'+
+    '<div class="choices" id="cbact"></div>';
+  cbPaint();cbRun();
+}
+function cbRun(){
+  if(CB.phase===1)runP1(0);
+  else if(CB.phase===2)runP2(0);
+  else runP3(0);
+}
+var P1=['me','B','me','A','me','B'];
+function runP1(i){
+  if(i>=P1.length){
+    CB.phase=2;
+    cbStat('第一轮结束——你拿到球 3 次。第二轮开始。');
+    setTimeout(function(){cbRun();},1100);return;
+  }
+  var to=P1[i];
+  cbStat('第一轮 · 热身（第 '+(i+1)+'/'+P1.length+' 次传递）');
+  if(to==='me'){
+    aiThrow('me',function(){
+      cbAsk(['A','B'],function(t){CB.holder=t;cbPaint();setTimeout(function(){runP1(i+1);},380);});
+    });
+  }else{
+    aiThrow(to,function(){runP1(i+1);});
+  }
+}
+function runP2(i){
+  var N=4;
+  if(i>=N){
+    CB.phase=3;CB.hasC=true;cbPaint();
+    cbStat('小C 加入了。球回到你手上——接下来 6 次都由你决定传给谁。');
+    setTimeout(function(){runP3(0);},1400);return;
+  }
+  cbStat('第二轮 · 你已经 <b>'+i+'</b> 次没拿到球了');
+  aiThrow(Math.random()<0.5?'A':'B',function(){runP2(i+1);});
+}
+/* 第三轮：轮流由 A / B / C 把球传给你（不是只有小C），
+   记录你「是否回传给刚传给你的人」= 对等记账 / 记仇倾向 */
+var IN3=['A','B','C','A','B','C'];
+function runP3(i){
+  if(i>=IN3.length){cbFinishCyber();return;}
+  var from=IN3[i];
+  CB.holder=from;cbPaint();
+  cbStat('第三轮 · 第 '+(i+1)+'/'+IN3.length+' 次 · 把球传给谁？');
+  setTimeout(function(){
+    aiThrow('me',function(){
+      cbAsk(['A','B','C'],function(t){
+        CB.p3[t]++;
+        if(t===from)CB.mirror++;
+        if(t==='C'){
+          // 小C 拿到球：随机分流，不固定只传回给你
+          cbStat('小C 接到球——它要抛给谁？');
+          setTimeout(function(){
+            var recips=['A','B','me'];
+            var to=recips[Math.floor(Math.random()*recips.length)]; // 分流：给 A / B / 你
+            aiThrow(to,function(){ setTimeout(function(){runP3(i+1);},420); });
+          },800);
+        }else{
+          CB.holder=t;cbPaint();
+          setTimeout(function(){runP3(i+1);},420);
+        }
+      });
+    });
+  },520);
+}
+function cbFinishCyber(){
+  var p=CB.p3;
+  var key;
+  var spread=Math.max(p.A,p.B,p.C)-Math.min(p.A,p.B,p.C);
+  var allThree=p.A>=1&&p.B>=1&&p.C>=1;
+  var key;
+  if(p.C>=3)key='care';                  // 关注弱小：明显偏向小C
+  else if(CB.mirror>=4)key='ledger';     // 记仇：回传给刚传你球的人
+  else if((p.A+p.B)>=4)key='forgive';    // 宽容：仍把球给之前冷落你的人
+  else if(allThree&&spread<=1)key='turn';// 轮着玩：三人分配均衡
+  else key='careless';                   // 无所谓：无明显模式、无波动
+  var stats='传给小C <b>'+p.C+'</b> 次 · 传给小A/小B <b>'+(p.A+p.B)+'</b> 次 · '+
+            '回传给刚传你球的人 <b>'+CB.mirror+'</b> 次';
+  showResult(CB.id,key,'',stats);
+}
+
+/* --- 结果 --- */
+function showResult(id, key, em, stats){
+  var d = DATA[id], r = d.results[key];
+  if(!r) return;
+  stage.innerHTML =
+    '<div class="result">' +
+      '<div class="rtype">你的结果 · ' + d.badge + ' ' + esc(d.name) + '</div>' +
+      (em ? '<div class="rpick">' + em + '</div>' : '') +
+      '<div class="rname">' + esc(r.name) + '</div>' +
+      '<div class="rline">「' + esc(r.line) + '」</div>' +
+      '<div class="tags">' + r.tags.map(function(t){return '<span class="chip">'+esc(t)+'</span>';}).join('') + '</div>' +
+      (stats ? '<div class="rstats">'+stats+'</div>' : '') +
+      '<div class="blind">盲区：' + esc(r.blind) + '</div>' +
+      '<div class="copy"><b>可晒文案</b>' + esc(r.copy) + '</div>' +
+      '<div class="btnrow">' +
+        '<button class="btn" id="again">再选一次</button>' +
+        '<button class="btn ghost" id="back">换一个测验</button>' +
+      '</div>' +
+    '</div>';
+  document.getElementById('again').onclick = function(){ switchTo(id); };
+  document.getElementById('back').onclick = function(){
+    var order = ['A','B','C','D','E','F'], i = order.indexOf(id);
+    switchTo(order[(i+1) % order.length]);
+  };
+}
+
+function switchTo(id){
+  BL=null; CB=null;
+  ST[id] = {};
+  [].forEach.call(document.querySelectorAll('#tabs button'), function(b){
+    b.classList.toggle('on', b.dataset.q === id);
+  });
+  var k = DATA[id].kind;
+  if(k === 'chair') renderChair(id);
+  else if(k === 'grid') renderGrid(id);
+  else if(k === 'balloon') renderBalloon(id);
+  else renderCyber(id);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('tabs').addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if(b && b.dataset.q) switchTo(b.dataset.q);
+});
+
+switchTo('A');
+
+document.addEventListener('keydown', function(e){
+  if(e.code==='Space' || e.key===' ' || e.key==='Spacebar'){
+    if(e.repeat) return;
+    var bank=document.getElementById('bank');
+    if(BL && document.getElementById('bl') && bank && !bank.disabled){
+      e.preventDefault();
+      blPump();
+    }
+  }
+});
+</script>
+
+</body>
+</html>
