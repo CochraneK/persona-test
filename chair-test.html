@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="PRPJJvDgT3GCsDJRGQL5Br">
+<head data-page-node-id="Kd4OydwgIDG7394fVKS2x7">
+<meta charset="UTF-8" data-page-node-id="Tv4nALSHG2eTZTe8L1wRMj" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="cw4hLSr8eZatsnkQkBBoJa" />
+<title>会议室座位人格测试 · 你选哪把椅子？</title>
+<style>
+  :root{
+    --bg:#ffffff; --card:#ffffff; --ink:#1F2D3A; --muted:#738796;
+    --line:#DCE8E8; --navy:#142A40; --teal:#24A69E; --teal-d:#1c857d;
+    --orange:#F29A49; --blue:#4D72D8;
+    --c1:#ef6c4d; --c2:#4d8def; --c3:#46c08a; --c4:#f0b429; --c5:#9b6ef0;
+    --panel:#EAF7F4; --shadow:0 14px 38px rgba(20,42,64,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Microsoft YaHei","微软雅黑","Segoe UI Emoji","Apple Color Emoji",-apple-system,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.7; padding:0 0 64px;
+    -webkit-font-smoothing:antialiased; letter-spacing:.2px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+  /* hero（合集风格） */
+  .hero{padding:50px 0 26px;border-bottom:1px solid var(--line)}
+  .kicker{font-size:12px;letter-spacing:.16em;color:var(--teal);font-weight:700;margin-bottom:12px}
+  h1{font-size:28px;line-height:1.3;color:var(--navy);font-weight:700;margin-bottom:12px}
+  .sub{font-size:14px;color:var(--muted);max-width:660px}
+  .warn{font-size:12px;color:var(--muted);margin-top:10px}
+
+  .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start;margin-top:26px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:18px 20px}
+  .panel h2{font-size:14.5px;color:var(--muted);font-weight:700;margin-bottom:12px;
+    display:flex;align-items:center;gap:8px}
+  .panel h2 .step{width:22px;height:22px;border-radius:6px;background:var(--navy);color:#fff;
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:800}
+
+  /* tabs（合集风格：白底、navy 选中、teal hover） */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{font-family:inherit;font-size:13px;cursor:pointer;background:#fff;border:1px solid var(--line);
+    color:var(--muted);padding:8px 16px;border-radius:2px;transition:.15s}
+  .tab:hover{border-color:var(--teal);color:var(--teal)}
+  .tab.active{background:var(--navy);border-color:var(--navy);color:#fff;
+    box-shadow:0 8px 18px rgba(20,42,64,.18)}
+
+  /* SVG room */
+  svg{width:100%;height:auto;display:block;user-select:none}
+  .chair{cursor:pointer;transition:transform .18s ease}
+  .chair .seat{fill:#e9eef5;stroke:#c4d2e6;stroke-width:1.5;transition:.18s}
+  .chair .back{fill:#d6dfec;stroke:#c4d2e6;stroke-width:1.5;transition:.18s}
+  .chair .badge{fill:#fff;stroke:#c4d2e6;stroke-width:1.5;transition:.18s}
+  .chair .num{fill:#3a4a60;font-size:15px;font-weight:800;pointer-events:none}
+  .chair .ring{fill:none;stroke:var(--teal);stroke-width:2.5;opacity:0;pointer-events:none}
+  .chair .hit{fill:transparent}
+  .chair:hover{transform:translateY(-3px)}
+  .chair:hover .seat,.chair:hover .back{fill:#d4eae6}
+  .chair:hover .badge{stroke:var(--teal)}
+  .chair.selected .seat,.chair.selected .back{fill:var(--teal);stroke:var(--teal-d)}
+  .chair.selected .badge{fill:var(--teal-d);stroke:var(--teal-d)}
+  .chair.selected .num{fill:#fff}
+  .chair.selected .ring{opacity:1;animation:pulse 1.6s ease-in-out infinite}
+  .chair.dim{opacity:.4}
+  @keyframes pulse{0%,100%{opacity:.12}50%{opacity:.55}}
+  .room-line{fill:#fbfcfe;stroke:#d8e1ec;stroke-width:2}
+  .table{fill:#eef5f3;stroke:#cfe0dd;stroke-width:2}
+  .table-hi{fill:#ffffff;opacity:.5}
+  .boss-body{fill:var(--navy)}
+  .boss-back{fill:#0e2233}
+  .boss-star{fill:var(--orange)}
+  .boss-label{fill:var(--navy);font-size:12.5px;font-weight:800}
+  .hint-text{fill:#9aa6b8;font-size:11px;font-weight:600}
+
+  /* 结果卡（合集结构：rtype → rpick → rname → rline → tags → 特点/五维 → blind → copy） */
+  #result .placeholder{color:var(--muted);text-align:center;padding:54px 10px;font-size:14.5px}
+  #result .placeholder .big{font-size:34px;display:block;margin-bottom:10px;opacity:.7}
+  .card-in{animation:rise .42s cubic-bezier(.22,1,.36,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .result{border:1px solid var(--line);border-radius:3px;padding:22px 22px 20px;background:#fff}
+  .rtype{font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.1em;margin-bottom:8px}
+  .rpick{font-size:34px;margin-bottom:6px;line-height:1.2}
+  .rname{font-size:26px;color:var(--navy);font-weight:700;margin-bottom:4px;line-height:1.3}
+  .ren{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .rline{font-size:15px;color:var(--muted);font-style:italic;margin-bottom:16px}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .chip{font-size:12px;color:var(--teal);border:1px solid var(--line);background:var(--panel);
+    padding:4px 11px;border-radius:2px}
+  .rsec{font-size:12.5px;font-weight:800;color:var(--teal-d);margin:12px 0 6px;
+    display:flex;align-items:center;gap:7px}
+  .rsec::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--teal)}
+  ul.feat{list-style:none;display:flex;flex-direction:column;gap:6px}
+  ul.feat li{position:relative;padding-left:20px;font-size:13.5px;color:#37444f}
+  ul.feat li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;
+    border-radius:50%;background:var(--teal);opacity:.85}
+  /* 五维条 */
+  .bars{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .bar-row{display:grid;grid-template-columns:68px 1fr 32px;align-items:center;gap:9px}
+  .bar-label{font-size:12px;color:#46566c;font-weight:600}
+  .bar-track{height:10px;background:#edf1f7;border-radius:8px;overflow:hidden}
+  .bar-fill{display:block;height:100%;width:0;border-radius:8px;transition:width .8s cubic-bezier(.22,1,.36,1);
+    box-shadow:inset 0 -2px 4px rgba(0,0,0,.12),inset 0 2px 3px rgba(255,255,255,.3)}
+  .bar-val{font-size:12.5px;font-weight:800;text-align:right}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;margin-top:2px}
+  @media(max-width:520px){.twocol{grid-template-columns:1fr}}
+  .blind{background:var(--panel);border-left:2px solid var(--orange);border-radius:0 6px 6px 0;
+    padding:10px 14px;font-size:13px;color:#7c4a26;margin-bottom:16px}
+  .blind b{color:var(--orange)}
+  .copy{background:var(--panel);border-left:2px solid var(--orange);border-radius:0 6px 6px 0;
+    padding:12px 14px;font-size:13.5px;color:var(--ink);margin-bottom:20px}
+  .copy b{display:block;color:var(--orange);font-size:11px;letter-spacing:.06em;margin-bottom:4px}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .btn{font-family:inherit;font-size:14px;cursor:pointer;background:var(--navy);color:#fff;border:none;
+    padding:10px 22px;border-radius:2px;transition:.15s}
+  .btn:hover{background:var(--teal)}
+  .btn.ghost{background:#fff;color:var(--muted);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--teal);color:var(--teal);background:#fff}
+
+  /* 底部 */
+  .src{margin-top:30px;padding:16px 18px;background:#fff;border:1px dashed var(--line);border-radius:14px;
+    font-size:12.5px;color:var(--muted);line-height:1.8}
+  .src b{color:#46566c}
+  .band{background:var(--navy);color:#fff;padding:22px 0;margin-top:30px}
+  .band p{font-size:12.5px;color:#C8D6DF;max-width:760px}
+  .band p + p{margin-top:7px}
+  .band b{color:#fff}
+</style>
+</head>
+<body data-page-node-id="He6uVNkRuPeK4CdHQiZS4O">
+<div class="wrap" data-page-node-id="gLdQVSDz2FiBBryHffLqqV">
+  <header class="hero" data-page-node-id="FMpNXEGqhC1kzEkssZXu56">
+    <div class="kicker" data-page-node-id="brhBQhXJD7FNpC24n6YypD">PROJECTIVE TEST · 空间投射</div>
+    <h1 data-page-node-id="T5C7bScdrMMQdkpWpsNHhC">会议室座位人格测试 · 你选哪把椅子？</h1>
+    <p class="sub" data-page-node-id="uhHrGD2uL4mBM2Zf3RGBZy">推门进房间，老板已坐在主持位。凭直觉，你会走向哪把椅子？这是一道空间投射测验——在不同布局里，落座位置暴露你的关系偏好。</p>
+    <div class="warn" data-page-node-id="nqewTQVdyALouzwJuqyMcb">⚠ 纯属娱乐，非科学测评；结果仅供自我觉察。</div>
+  </header>
+
+  <div class="grid" data-page-node-id="VPUAoPt9RUOcSjanxyZUxg">
+    <!-- 左：场景图 -->
+    <div class="panel" data-page-node-id="nGBtveaasghhkvPiN75V6d">
+      <h2 data-page-node-id="iCKEMnpUXUECvzgc8z2ur3"><span class="step" data-page-node-id="zKXXj3IvR7v8g6g8VxO7fQ">1</span> 选场景，点一把椅子（想象你正走进去）</h2>
+      <div class="tabs" id="tabs" data-page-node-id="plGaUQB3lTUWobjAmfO2pk"></div>
+      <svg viewBox="0 0 680 520" id="room" role="img" aria-label="场景俯视图" data-page-node-id="aFl1lZHHNQqoaMnlgTCoQs">
+        <g id="static" data-page-node-id="GDNYJhpeIKssWqTUDxTjlU"></g>
+        <g id="chairs" data-page-node-id="ln4DHN1FiWysdCEZ20v0bI"></g>
+      </svg>
+    </div>
+
+    <!-- 右：结果 -->
+    <div class="panel" data-page-node-id="op1n1z53G1yhsvhfGxCV4R">
+      <h2 data-page-node-id="0yt4dCzW45a89RbhjT5wiR"><span class="step" data-page-node-id="o6MG3sdv4A9eWtVeE4S7Ei">2</span> 你的落座人格</h2>
+      <div id="result" data-page-node-id="TRrMNMNlVgn2MxEp1RaEOP">
+        <div class="placeholder" data-page-node-id="lhIJdxfutLfRF6bS4u83AI"><span class="big" data-page-node-id="p8rhEEUtzBAhKuoL71Udpb">🪑</span>选择上方场景，再点击任意一把椅子，<br data-page-node-id="FvOwiiCRG7sF5tIqQpBa1J">立刻解锁你的潜意识落座偏好</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="src" data-page-node-id="qj03G3dQF9atW5nzoeHVo3">
+    <b data-page-node-id="DpNtCuvL2Dg7RnpFaJzgfM">测试原理（科普）</b>：人对空间的选取属于<b data-page-node-id="946ybZMSDa4xTzFtwbxCrt">空间心理学（Proxemics）</b>范畴——人类学家 Edward T. Hall（1963）提出，我们与他人的距离是一种非语言信号，暗示舒适感与关系性质。无论在长桌、圆桌、U 型还是开放散座，离权威/焦点越近往往越主动、正对面多直接敢言、桌缘与远端角落则偏向观察与边界感。这类「选椅子」测试本质是一种<b data-page-node-id="TB4KeYsE7zZBcoqNBkXZwI">投射测验（projective test）</b>，类似罗夏墨迹，让你把内在偏好投射到模糊场景上，<b data-page-node-id="Q67XtTFBJ1VFNnNcPkPZ68">仅供自我觉察与娱乐，不能替代专业心理测评</b>。
+    <div style="margin-top:8px" data-page-node-id="htjzHnPWo2ARxEBrBNck8r">参考来源：Times of India《Choose a chair…》、Jagran Josh《Pick a Seat to Find Out Your Social Instincts》、港台行为心理版「開會揀座位」测试、简书/头条 14–21 椅变体等公开趣味测试整理而成。</div>
+  </div>
+
+  <footer class="band" data-page-node-id="lgKPu5q3kuoeXVbPCOTsQg">
+    <div class="wrap" data-page-node-id="nkh6lIflFXzAHouUGd469O">
+      <p data-page-node-id="M7r77sE5CaMrHgSikw1FV6">娱乐向视觉投射小测验，趣味性优先，结果不构成心理诊断或人格评估。</p>
+      <p data-page-node-id="7JvFCc5W7iQGscxTUEGvNM">参考《人格营销清单.md》及公开趣味测试整理；不收集任何数据，全程在浏览器本地完成。</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+const DIM = [
+  {key:"act",  label:"主动进取", color:"#ef6c4d"},
+  {key:"ind",  label:"独立思考", color:"#4d8def"},
+  {key:"soc",  label:"社交亲和", color:"#46c08a"},
+  {key:"risk", label:"风险偏好", color:"#f0b429"},
+  {key:"auth", label:"权威亲近", color:"#9b6ef0"},
+];
+
+const CHAIRS = {
+  1:{icon:"🤝",name:"战略盟友", en:"The First Mate / Co-Pilot",
+     quote:"我来是要帮上忙的，需要时我就在。",
+     feat:["紧挨权威左侧，想靠近核心贡献价值","尊重层级但不畏惧，是可靠的执行者","危机或混乱时主动靠前，让事情转起来"],
+     blind:"容易把别人的事当成自己的责任，需注意别过度担责而耗尽自己。",
+     tags:["靠核心","可靠","主动"],
+     copy:"我选了紧挨老板左手边的那把椅子——战略盟友型，需要时我就在。你呢？",
+     dim:{act:85,ind:55,soc:70,risk:60,auth:80}},
+  2:{icon:"🕊️",name:"外交缓冲者", en:"The Diplomat / Buffer Zone",
+     quote:"我在场，但不急着表态。",
+     feat:["靠近权威却留有余地，在圈内但不抢镜","观察敏锐、擅长调和，等气氛稳了再出手","高度重视和谐，是天然的谈判/缓冲角色"],
+     blind:"可能因过度回避冲突而逐渐失去自己的立场，记得适时亮明态度。",
+     tags:["调和","留余地","重和谐"],
+     copy:"靠近权威却留了一步——外交缓冲者，我在场但不抢镜。",
+     dim:{act:55,ind:65,soc:80,risk:45,auth:65}},
+  3:{icon:"🧠",name:"审慎思考者", en:"The Calculated Thinker",
+     quote:"你们可以快点，但沉默往往更聪明。",
+     feat:["坐在远端长边，先想后说","旁人说得乱成团时，他已看清那一个被忽略的关键","克制即超能力，用慢节奏化解紧张"],
+     blind:"节奏太慢可能被误读为不参与，关键时刻要主动让想法被听见。",
+     tags:["先想后说","克制","看关键"],
+     copy:"我坐远端长边，先想清楚再开口——审慎思考者。",
+     dim:{act:35,ind:85,soc:45,risk:30,auth:40}},
+  4:{icon:"👁️",name:"沉默观察家", en:"The Silent Observer",
+     quote:"我沉默，但我看见一切。",
+     feat:["偏好底部角落的边缘视角","读人、读气氛的高手，出手时分量很重","在边缘找到力量，先充分消化再踏入光里"],
+     blind:"长期隐形会让想法不被听见，适度前移，别让洞察烂在心里。",
+     tags:["边缘视角","读气氛","后发制人"],
+     copy:"角落那把是我的——沉默观察家，我沉默，但我看见一切。",
+     dim:{act:30,ind:75,soc:40,risk:35,auth:30}},
+  5:{icon:"⚡",name:"直接挑战者", en:"The Direct Challenger",
+     quote:"有话直说，我不退。",
+     feat:["正对权威，迎面而上","自信、直接，紧张时不缩反进","享受辩论，也尊重敢言的人"],
+     blind:"易被误读为好斗，勇气之外也要看准时机与对象。",
+     tags:["正对权威","直接","敢言"],
+     copy:"正对老板我就坐了——直接挑战者，有话直说。",
+     dim:{act:90,ind:80,soc:50,risk:85,auth:25}},
+  6:{icon:"♟️",name:"策略参与者", en:"The Selective Contributor",
+     quote:"有价值，我才出手。",
+     feat:["保护自己的心理能量，不参与会议「表演」","只在关键节点介入，像 strategist 等待时机","不追每一点评论，保持冷静不内耗"],
+     blind:"可能被看成疏离，需主动露面，避免重要贡献被遗忘。",
+     tags:["选择性","不表演","冷静"],
+     copy:"只在关键节点出手——策略参与者，有价值才开口。",
+     dim:{act:50,ind:80,soc:45,risk:50,auth:45}},
+  7:{icon:"🌟",name:"忠诚门徒", en:"The Loyal Protégé",
+     quote:"靠近核心，我才安心。",
+     feat:["紧挨权威右侧，渴望指引与方向","靠近权威获得安全感，是核心圈一员","重视导师，从「被看见」中汲取信心"],
+     blind:"过度把价值绑定在他人认可上，易因回报不对等而内耗。",
+     tags:["靠核心","求指引","核心圈"],
+     copy:"紧挨老板右手边——忠诚门徒，靠近核心我才安心。",
+     dim:{act:65,ind:45,soc:65,risk:40,auth:85}},
+  8:{icon:"💛",name:"共情调和者", en:"The Social Glue",
+     quote:"我来，是让气氛松一点。",
+     feat:["团队的情感心脏，敏锐捕捉每个人情绪","用微笑、玩笑、闲聊软化僵硬氛围","让人愿意打开自己，是关系黏合剂"],
+     blind:"常照顾别人却忽略自己，记得也给自己留一点温柔。",
+     tags:["情感心脏","会缓和","人缘好"],
+     copy:"我是让气氛松下来的人——共情调和者💛。",
+     dim:{act:50,ind:50,soc:95,risk:40,auth:55}},
+  9:{icon:"🔍",name:"分析批评者", en:"The Internal Auditor",
+     quote:"我参与，但不随便点头。",
+     feat:["远端右侧，抬眉式参与","总在找逻辑漏洞，重真相胜过舒服","敢做那个异议之声，促成更稳妥的结果"],
+     blind:"易被当成「唱反调」，需平衡质疑与支持，让批判长出建设性。",
+     tags:["找漏洞","重真相","异议之声"],
+     copy:"我参与但不随便点头——分析批评者🔍。",
+     dim:{act:45,ind:90,soc:40,risk:55,auth:35}},
+};
+
+const ROOM = `
+  <defs>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#e9eef5" stroke-width="1"/>
+    </pattern>
+    <filter id="ds" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#142A40" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect class="room-line" x="36" y="36" width="608" height="448" rx="18"/>
+  <rect x="36" y="36" width="608" height="448" rx="18" fill="url(#grid)"/>`;
+
+// 每把椅子：id + 座面中心(cx,cy) + 椅背朝向 dir(L/R/B/T/C)
+const LAYOUTS = {
+  long:{
+    name:"长桌会议室",
+    table:`
+      <rect class="table" x="262" y="142" width="156" height="258" rx="22" filter="url(#ds)"/>
+      <rect class="table-hi" x="276" y="156" width="128" height="14" rx="7"/>
+      <g><rect class="boss-back" x="326" y="76" width="28" height="12" rx="4"/>
+      <rect class="boss-body" x="320" y="88" width="40" height="32" rx="9"/>
+      <text class="boss-star" x="340" y="70" text-anchor="middle" font-size="16">★</text>
+      <text class="boss-label" x="340" y="62" text-anchor="middle">主持位</text></g>
+      <text class="hint-text" x="340" y="50" text-anchor="middle">↑ 权威 / BOSS 已就座</text>`,
+    chairs:[
+      {id:1,cx:236,cy:190,dir:"L"},{id:2,cx:236,cy:278,dir:"L"},{id:3,cx:236,cy:366,dir:"L"},
+      {id:7,cx:444,cy:190,dir:"R"},{id:8,cx:444,cy:278,dir:"R"},{id:9,cx:444,cy:366,dir:"R"},
+      {id:4,cx:290,cy:435,dir:"B"},{id:5,cx:336,cy:435,dir:"B"},{id:6,cx:382,cy:435,dir:"B"},
+    ]
+  },
+  round:{
+    name:"圆桌讨论",
+    table:`
+      <circle class="table" cx="340" cy="285" r="115" filter="url(#ds)"/>
+      <circle class="table-hi" cx="340" cy="285" r="98" fill="#ffffff" opacity="0.5"/>
+      <g><rect class="boss-back" x="326" y="116" width="28" height="12" rx="4"/>
+      <rect class="boss-body" x="320" y="128" width="40" height="32" rx="9"/>
+      <text class="boss-star" x="340" y="110" text-anchor="middle" font-size="16">★</text>
+      <text class="boss-label" x="340" y="102" text-anchor="middle">主持位</text></g>
+      <text class="hint-text" x="340" y="86" text-anchor="middle">↑ 权威 / BOSS 已就座</text>`,
+    chairs:[
+      {id:1,cx:250,cy:205,dir:"L"},{id:2,cx:215,cy:285,dir:"L"},{id:3,cx:250,cy:365,dir:"L"},
+      {id:7,cx:430,cy:205,dir:"R"},{id:8,cx:465,cy:285,dir:"R"},{id:9,cx:430,cy:365,dir:"R"},
+      {id:4,cx:300,cy:425,dir:"B"},{id:5,cx:340,cy:435,dir:"B"},{id:6,cx:380,cy:425,dir:"B"},
+    ]
+  },
+  uform:{
+    name:"U 型会议",
+    table:`
+      <rect class="table" x="232" y="150" width="42" height="250" rx="12" filter="url(#ds)"/>
+      <rect class="table" x="406" y="150" width="42" height="250" rx="12" filter="url(#ds)"/>
+      <rect class="table" x="232" y="372" width="216" height="42" rx="12" filter="url(#ds)"/>
+      <g><rect class="boss-back" x="326" y="86" width="28" height="12" rx="4"/>
+      <rect class="boss-body" x="320" y="98" width="40" height="32" rx="9"/>
+      <text class="boss-star" x="340" y="80" text-anchor="middle" font-size="16">★</text>
+      <text class="boss-label" x="340" y="72" text-anchor="middle">主持位</text></g>
+      <text class="hint-text" x="340" y="62" text-anchor="middle">↑ 权威 / BOSS 在 U 型开口</text>`,
+    chairs:[
+      {id:1,cx:292,cy:200,dir:"L"},{id:2,cx:292,cy:285,dir:"L"},{id:3,cx:292,cy:365,dir:"L"},
+      {id:7,cx:388,cy:200,dir:"R"},{id:8,cx:388,cy:285,dir:"R"},{id:9,cx:388,cy:365,dir:"R"},
+      {id:4,cx:300,cy:352,dir:"B"},{id:5,cx:340,cy:352,dir:"B"},{id:6,cx:380,cy:352,dir:"B"},
+    ]
+  },
+  lounge:{
+    name:"开放散座",
+    table:`
+      <circle cx="340" cy="130" r="28" fill="#eafaf7" stroke="#bfe9e3" stroke-width="2"/>
+      <text class="boss-star" x="340" y="126" text-anchor="middle" font-size="18">★</text>
+      <text class="boss-label" x="340" y="174" text-anchor="middle">焦点 / 主讲</text>
+      <text class="hint-text" x="340" y="500" text-anchor="middle">椅子散落开放区，凭直觉选落座</text>`,
+    chairs:[
+      {id:1,cx:250,cy:185,dir:"C"},{id:2,cx:212,cy:300,dir:"C"},{id:3,cx:185,cy:405,dir:"C"},
+      {id:7,cx:430,cy:185,dir:"C"},{id:8,cx:468,cy:300,dir:"C"},{id:9,cx:495,cy:405,dir:"C"},
+      {id:4,cx:250,cy:455,dir:"C"},{id:5,cx:340,cy:450,dir:"C"},{id:6,cx:430,cy:455,dir:"C"},
+    ]
+  },
+};
+
+function drawChair(c){
+  const {id,cx,cy,dir}=c;
+  let back="";
+  if(dir==="L") back=`<rect class="back" x="${cx-35}" y="${cy-20}" width="13" height="40" rx="5"/>`;
+  else if(dir==="R") back=`<rect class="back" x="${cx+22}" y="${cy-20}" width="13" height="40" rx="5"/>`;
+  else if(dir==="B") back=`<rect class="back" x="${cx-20}" y="${cy+22}" width="40" height="13" rx="5"/>`;
+  else if(dir==="T") back=`<rect class="back" x="${cx-20}" y="${cy-35}" width="40" height="13" rx="5"/>`;
+  return `<g class="chair" data-id="${id}">
+    ${back}
+    <rect class="seat" x="${cx-22}" y="${cy-22}" width="44" height="44" rx="10"/>
+    <circle class="ring" cx="${cx}" cy="${cy}" r="30"/>
+    <circle class="badge" cx="${cx}" cy="${cy}" r="15"/>
+    <text class="num" x="${cx}" y="${cy+5}" text-anchor="middle">${id}</text>
+    <rect class="hit" x="${cx-30}" y="${cy-30}" width="60" height="60"/>
+  </g>`;
+}
+
+const staticEl = document.getElementById("static");
+const chairsEl = document.getElementById("chairs");
+const tabsEl   = document.getElementById("tabs");
+const result   = document.getElementById("result");
+const room     = document.getElementById("room");
+let currentKey = "long";
+
+function buildTabs(){
+  tabsEl.innerHTML = Object.entries(LAYOUTS).map(([k,v])=>
+    `<button class="tab${k===currentKey?" active":""}" data-key="${k}">${v.name}</button>`).join("");
+}
+
+function setLayout(key){
+  currentKey = key;
+  const L = LAYOUTS[key];
+  staticEl.innerHTML = ROOM + L.table;
+  chairsEl.innerHTML = L.chairs.map(drawChair).join("");
+  chairsEl.querySelectorAll(".chair").forEach(g=>g.classList.remove("selected","dim"));
+  buildTabs();
+  reset();
+}
+
+function render(id){
+  const c = CHAIRS[id];
+  if(!c) return;
+  const bars = DIM.map(d=>{
+    const v = c.dim[d.key];
+    return `<div class="bar-row">
+      <span class="bar-label">${d.label}</span>
+      <span class="bar-track"><span class="bar-fill" style="background:${d.color}" data-v="${v}"></span></span>
+      <span class="bar-val" style="color:${d.color}">${v}</span>
+    </div>`;
+  }).join("");
+  result.innerHTML = `<div class="card-in">
+    <div class="result">
+      <div class="rtype">你的落座人格 · 椅子 ${id} · ${LAYOUTS[currentKey].name}</div>
+      <div class="rpick">${c.icon}</div>
+      <div class="rname">${c.name}</div>
+      <div class="ren">${c.en}</div>
+      <div class="rline">「${c.quote}」</div>
+      <div class="tags">${c.tags.map(t=>`<span class="chip">${t}</span>`).join("")}</div>
+      <div class="twocol">
+        <div>
+          <div class="rsec">你的特点</div>
+          <ul class="feat">${c.feat.map(f=>`<li>${f}</li>`).join("")}</ul>
+        </div>
+        <div>
+          <div class="rsec">五维人格画像</div>
+          <div class="bars">${bars}</div>
+        </div>
+      </div>
+      <div class="rsec">潜在盲区</div>
+      <div class="blind"><b>提醒 ·</b> ${c.blind}</div>
+      <div class="copy"><b>可晒文案</b>${c.copy}</div>
+      <div class="btnrow">
+        <button class="btn" onclick="reset()">↺ 重新选择</button>
+      </div>
+    </div>
+  </div>`;
+  requestAnimationFrame(()=>{
+    result.querySelectorAll(".bar-fill").forEach(el=>{ el.style.width = el.dataset.v + "%"; });
+  });
+}
+
+function reset(){
+  result.innerHTML = `<div class="placeholder"><span class="big">🪑</span>选择上方场景，再点击任意一把椅子，<br>立刻解锁你的潜意识落座偏好</div>`;
+  chairsEl.querySelectorAll(".chair").forEach(g=>g.classList.remove("selected","dim"));
+}
+
+function selectChair(g){
+  const id = g.dataset.id;
+  chairsEl.querySelectorAll(".chair").forEach(x=>{
+    x.classList.toggle("selected", x===g);
+    x.classList.toggle("dim", x!==g);
+  });
+  render(id);
+}
+
+room.addEventListener("click", e=>{
+  const g = e.target.closest(".chair");
+  if(g) selectChair(g);
+});
+tabsEl.addEventListener("click", e=>{
+  const b = e.target.closest(".tab");
+  if(b) setLayout(b.dataset.key);
+});
+
+setLayout("long");
+</script>
+</body>
+</html>
