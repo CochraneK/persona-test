@@ -1,0 +1,19 @@
+{
+  "name": "Persona Test · 人格投射测验",
+  "short_name": "Persona Test",
+  "description": "12 个轻量、可玩、可分享的人格投射与行为小游戏。",
+  "start_url": "./play.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FAFCFC",
+  "theme_color": "#142A40",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
