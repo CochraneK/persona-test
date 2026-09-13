@@ -93,24 +93,36 @@ export function go(requestedId, options = {}) {
   cleanup();
   cleanup = () => {};
 
-  const id = TESTS[requestedId] ? requestedId : 'chair';
+  const requestedValid = Boolean(TESTS[requestedId]);
+  const id = requestedValid ? requestedId : 'chair';
   const test = TESTS[id];
   currentId = id;
   setActiveTab(id);
   document.title = `${test.name} · Persona Test`;
 
   const route = options.route || { result: '', scene: options.scene || '' };
-  const scene = options.scene || route.scene || '';
+  const requestedScene = options.scene || route.scene || '';
+  const scene = id === 'chair' ? safeScene(test, requestedScene) : '';
   const shouldWrite = options.syncRoute !== false;
+
   if (shouldWrite) writeRoute(id, route.result || '', scene, options.historyMode || 'replace');
 
-  if (showDeepLinkedResult(id, test, route.result, scene)) {
+  const restored = showDeepLinkedResult(id, test, route.result, scene);
+  if (restored) {
+    if (!shouldWrite && (!requestedValid || (id === 'chair' && requestedScene !== scene) || (id !== 'chair' && requestedScene))) {
+      writeRoute(id, route.result, scene, 'replace');
+    }
     scrollTop();
     window.__PERSONA_READY__ = true;
     return;
   }
 
-  if (shouldWrite && route.result) writeRoute(id, '', scene, 'replace');
+  if (!shouldWrite && (!requestedValid || route.result || requestedScene !== scene)) {
+    writeRoute(id, '', scene, 'replace');
+  } else if (shouldWrite && route.result) {
+    writeRoute(id, '', scene, 'replace');
+  }
+
   cleanup = launchRenderer(id, test, scene) || (() => {});
   scrollTop();
   window.__PERSONA_READY__ = true;
