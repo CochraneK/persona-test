@@ -15,5 +15,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check JavaScript syntax
+        run: node --check assets/play-shell.js
+      - name: Check Python syntax
+        run: python -m py_compile scripts/optimize-images.py
       - name: Validate static project
         run: node scripts/check-static.mjs
