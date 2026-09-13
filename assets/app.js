@@ -1,5 +1,6 @@
 import { ORDER as BASE_ORDER, TESTS as BASE_TESTS } from './data/test-data.js';
 import { CONTENT_ORDER, CONTENT_TESTS } from './data/content-pack.js';
+import { INTERACTION_ORDER, INTERACTION_TESTS } from './data/interaction-pack.js';
 import { readRoute, writeRoute, SHAREABLE_RESULT_TESTS } from './core/router.js';
 import { nextTestId, safeScene } from './core/ui.js';
 import { renderStandardResult, renderChairResult } from './core/result.js';
@@ -8,9 +9,13 @@ import { renderMbti } from './renderers/mbti.js';
 import { renderChair } from './renderers/chair.js';
 import { renderBalloon } from './renderers/balloon.js';
 import { renderCyberball } from './renderers/cyberball.js';
+import { renderRank } from './renderers/rank.js';
+import { renderBinary } from './renderers/binary.js';
+import { renderAllocate } from './renderers/allocate.js';
+import { renderChallenge } from './renderers/challenge.js';
 
-const ORDER = [...BASE_ORDER, ...CONTENT_ORDER];
-const TESTS = { ...BASE_TESTS, ...CONTENT_TESTS };
+const ORDER = [...BASE_ORDER, ...CONTENT_ORDER, ...INTERACTION_ORDER];
+const TESTS = { ...BASE_TESTS, ...CONTENT_TESTS, ...INTERACTION_TESTS };
 
 const stage = document.getElementById('stage');
 const tabs = document.getElementById('tabs');
@@ -55,18 +60,26 @@ function showDeepLinkedResult(id, test, result, scene) {
   });
 }
 
-function launchRenderer(id, test, scene) {
+function showStandard(id, test, key, stats = '', image = '') {
+  renderStandardResult({
+    stage, id, test, key, stats, image,
+    onAgain: () => again(id),
+    onNext: () => next(id)
+  });
+}
+
+function launchRenderer(id, test, scene, route) {
   const base = { stage, test };
   if (test.kind === 'grid' || test.kind === 'swatch' || test.kind === 'symbol') {
     return renderGrid({ ...base, onResult: (key, image) => {
       writeRoute(id, key);
-      renderStandardResult({ stage, id, test, key, image, onAgain: () => again(id), onNext: () => next(id) });
+      showStandard(id, test, key, '', image);
     }});
   }
   if (test.kind === 'mbti') {
     return renderMbti({ ...base, onResult: (key) => {
       writeRoute(id, key);
-      renderStandardResult({ stage, id, test, key, onAgain: () => again(id), onNext: () => next(id) });
+      showStandard(id, test, key);
     }});
   }
   if (test.kind === 'chair') {
@@ -84,13 +97,46 @@ function launchRenderer(id, test, scene) {
   if (test.kind === 'balloon') {
     return renderBalloon({ ...base, onResult: (key, stats) => {
       writeRoute(id);
-      renderStandardResult({ stage, id, test, key, stats, onAgain: () => again(id), onNext: () => next(id) });
+      showStandard(id, test, key, stats);
     }});
   }
-  return renderCyberball({ ...base, onResult: (key, stats) => {
-    writeRoute(id);
-    renderStandardResult({ stage, id, test, key, stats, onAgain: () => again(id), onNext: () => next(id) });
-  }});
+  if (test.kind === 'cyber') {
+    return renderCyberball({ ...base, onResult: (key, stats) => {
+      writeRoute(id);
+      showStandard(id, test, key, stats);
+    }});
+  }
+  if (test.kind === 'rank') {
+    return renderRank({ ...base, onResult: (key, stats) => {
+      writeRoute(id, key);
+      showStandard(id, test, key, stats);
+    }});
+  }
+  if (test.kind === 'binary') {
+    return renderBinary({ ...base, onResult: (key, stats) => {
+      writeRoute(id, key);
+      showStandard(id, test, key, stats);
+    }});
+  }
+  if (test.kind === 'allocate') {
+    return renderAllocate({ ...base, onResult: (key, stats) => {
+      writeRoute(id, key);
+      showStandard(id, test, key, stats);
+    }});
+  }
+  if (test.kind === 'challenge') {
+    return renderChallenge({
+      ...base,
+      challengeCode: route.challenge || '',
+      onInvite: (code) => writeRoute(id, '', '', 'replace', code),
+      onPairResult: (key, stats) => {
+        writeRoute(id);
+        showStandard(id, test, key, stats);
+      },
+      onRestart: () => again(id)
+    });
+  }
+  return () => {};
 }
 
 export function go(requestedId, options = {}) {
@@ -104,16 +150,18 @@ export function go(requestedId, options = {}) {
   setActiveTab(id);
   document.title = `${test.name} · Persona Test`;
 
-  const route = options.route || { result: '', scene: options.scene || '' };
+  const route = options.route || { result: '', scene: options.scene || '', challenge: '', invalidChallenge: false };
   const requestedScene = options.scene || route.scene || '';
   const scene = id === 'chair' ? safeScene(test, requestedScene) : '';
   const shouldWrite = options.syncRoute !== false;
 
-  if (shouldWrite) writeRoute(id, route.result || '', scene, options.historyMode || 'replace');
+  if (shouldWrite) {
+    writeRoute(id, route.result || '', scene, options.historyMode || 'replace', id === 'sync' ? route.challenge : '');
+  }
 
   const restored = showDeepLinkedResult(id, test, route.result, scene);
   if (restored) {
-    if (!shouldWrite && (!requestedValid || (id === 'chair' && requestedScene !== scene) || (id !== 'chair' && requestedScene))) {
+    if (!shouldWrite && (!requestedValid || (id === 'chair' && requestedScene !== scene) || (id !== 'chair' && requestedScene) || route.invalidChallenge || route.challenge)) {
       writeRoute(id, route.result, scene, 'replace');
     }
     scrollTop();
@@ -121,13 +169,14 @@ export function go(requestedId, options = {}) {
     return;
   }
 
-  if (!shouldWrite && (!requestedValid || route.result || requestedScene !== scene)) {
-    writeRoute(id, '', scene, 'replace');
+  const routeNeedsCleanup = !requestedValid || route.result || requestedScene !== scene || route.invalidChallenge || (id !== 'sync' && route.challenge);
+  if (!shouldWrite && routeNeedsCleanup) {
+    writeRoute(id, '', scene, 'replace', id === 'sync' ? route.challenge : '');
   } else if (shouldWrite && route.result) {
-    writeRoute(id, '', scene, 'replace');
+    writeRoute(id, '', scene, 'replace', id === 'sync' ? route.challenge : '');
   }
 
-  cleanup = launchRenderer(id, test, scene) || (() => {});
+  cleanup = launchRenderer(id, test, scene, route) || (() => {});
   scrollTop();
   window.__PERSONA_READY__ = true;
 }
