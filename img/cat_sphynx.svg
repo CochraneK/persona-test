@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="斯芬克斯猫插画">
+  <rect width="800" height="600" fill="#F4ECE4"/>
+  <ellipse cx="400" cy="495" rx="230" ry="38" fill="#E5D7CC"/>
+  <path d="M265 170 190 70l18 170c-36 38-58 94-58 160 0 118 93 178 250 178s250-60 250-178c0-66-22-122-58-160l18-170-75 100c-38-22-83-34-135-34s-97 12-135 34Z" fill="#D7A88E" stroke="#7D5B50" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M232 112 214 216l55-47M568 112l18 104-55-47" fill="none" stroke="#9B6F60" stroke-width="11" stroke-linecap="round"/>
+  <path d="M305 270c32-26 66-28 95-8M495 270c-32-26-66-28-95-8" fill="none" stroke="#7D5B50" stroke-width="12" stroke-linecap="round"/>
+  <ellipse cx="325" cy="306" rx="28" ry="40" fill="#F0D76B" stroke="#6C5A3D" stroke-width="8"/>
+  <ellipse cx="475" cy="306" rx="28" ry="40" fill="#F0D76B" stroke="#6C5A3D" stroke-width="8"/>
+  <ellipse cx="325" cy="310" rx="7" ry="24" fill="#263746"/>
+  <ellipse cx="475" cy="310" rx="7" ry="24" fill="#263746"/>
+  <path d="M372 365c18 16 38 16 56 0" fill="none" stroke="#7D5B50" stroke-width="10" stroke-linecap="round"/>
+  <path d="M400 344c-12 0-20 8-20 16 0 10 9 18 20 18s20-8 20-18c0-8-8-16-20-16Z" fill="#8E5F5B"/>
+  <path d="M270 373c-48-8-85-3-117 9M274 394c-52 3-90 14-121 31M530 373c48-8 85-3 117 9M526 394c52 3 90 14 121 31" fill="none" stroke="#7D5B50" stroke-width="7" stroke-linecap="round"/>
+  <path d="M284 430c35 25 68 28 116 9M516 430c-35 25-68 28-116 9" fill="none" stroke="#B47B68" stroke-width="9" stroke-linecap="round" opacity=".8"/>
+  <text x="400" y="555" text-anchor="middle" font-family="sans-serif" font-size="28" font-weight="700" fill="#7D5B50">SPHYNX · 斯芬克斯猫</text>
+</svg>
