@@ -1,0 +1,35 @@
+name: Bootstrap test data
+
+on:
+  push:
+    branches: [finalize-modular-product]
+    paths:
+      - persona-image.html
+      - scripts/extract-test-data.mjs
+      - .github/workflows/bootstrap-test-data.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Extract normalized test data
+        run: node scripts/extract-test-data.mjs
+      - name: Commit generated module
+        shell: bash
+        run: |
+          if git diff --quiet -- assets/data/test-data.js; then
+            echo "Generated test data already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/data/test-data.js
+          git commit -m "Generate normalized test data [skip ci]"
+          git push
