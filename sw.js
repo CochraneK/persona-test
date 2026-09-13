@@ -1,4 +1,4 @@
-const CACHE = 'persona-test-v5';
+const CACHE = 'persona-test-v6';
 const APP_SHELL = [
   './',
   './index.html',
@@ -24,7 +24,8 @@ const APP_SHELL = [
   './assets/renderers/rank.js',
   './assets/renderers/binary.js',
   './assets/renderers/allocate.js',
-  './assets/renderers/challenge.js'
+  './assets/renderers/challenge.js',
+  './assets/renderers/mirror.js'
 ];
 
 self.addEventListener('install', (event) => {

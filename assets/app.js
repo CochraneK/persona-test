@@ -1,7 +1,7 @@
 import { ORDER as BASE_ORDER, TESTS as BASE_TESTS } from './data/test-data.js';
 import { CONTENT_ORDER, CONTENT_TESTS } from './data/content-pack.js';
 import { INTERACTION_ORDER, INTERACTION_TESTS } from './data/interaction-pack.js';
-import { readRoute, writeRoute, SHAREABLE_RESULT_TESTS } from './core/router.js';
+import { readRoute, writeRoute, SHAREABLE_RESULT_TESTS, CHALLENGE_TESTS } from './core/router.js';
 import { nextTestId, safeScene } from './core/ui.js';
 import { renderStandardResult, renderChairResult } from './core/result.js';
 import { renderGrid } from './renderers/grid.js';
@@ -13,6 +13,7 @@ import { renderRank } from './renderers/rank.js';
 import { renderBinary } from './renderers/binary.js';
 import { renderAllocate } from './renderers/allocate.js';
 import { renderChallenge } from './renderers/challenge.js';
+import { renderMirror } from './renderers/mirror.js';
 
 const ORDER = [...BASE_ORDER, ...CONTENT_ORDER, ...INTERACTION_ORDER];
 const TESTS = { ...BASE_TESTS, ...CONTENT_TESTS, ...INTERACTION_TESTS };
@@ -124,6 +125,12 @@ function launchRenderer(id, test, scene, route) {
       showStandard(id, test, key, stats);
     }});
   }
+  if (test.kind === 'mirror') {
+    return renderMirror({ ...base, onResult: (key, stats) => {
+      writeRoute(id);
+      showStandard(id, test, key, stats);
+    }});
+  }
   if (test.kind === 'challenge') {
     return renderChallenge({
       ...base,
@@ -146,6 +153,7 @@ export function go(requestedId, options = {}) {
   const requestedValid = Boolean(TESTS[requestedId]);
   const id = requestedValid ? requestedId : 'chair';
   const test = TESTS[id];
+  const challengeTest = CHALLENGE_TESTS.has(id);
   currentId = id;
   setActiveTab(id);
   document.title = `${test.name} · Persona Test`;
@@ -156,7 +164,7 @@ export function go(requestedId, options = {}) {
   const shouldWrite = options.syncRoute !== false;
 
   if (shouldWrite) {
-    writeRoute(id, route.result || '', scene, options.historyMode || 'replace', id === 'sync' ? route.challenge : '');
+    writeRoute(id, route.result || '', scene, options.historyMode || 'replace', challengeTest ? route.challenge : '');
   }
 
   const restored = showDeepLinkedResult(id, test, route.result, scene);
@@ -169,11 +177,11 @@ export function go(requestedId, options = {}) {
     return;
   }
 
-  const routeNeedsCleanup = !requestedValid || route.result || requestedScene !== scene || route.invalidChallenge || (id !== 'sync' && route.challenge);
+  const routeNeedsCleanup = !requestedValid || route.result || requestedScene !== scene || route.invalidChallenge || (!challengeTest && route.challenge);
   if (!shouldWrite && routeNeedsCleanup) {
-    writeRoute(id, '', scene, 'replace', id === 'sync' ? route.challenge : '');
+    writeRoute(id, '', scene, 'replace', challengeTest ? route.challenge : '');
   } else if (shouldWrite && route.result) {
-    writeRoute(id, '', scene, 'replace', id === 'sync' ? route.challenge : '');
+    writeRoute(id, '', scene, 'replace', challengeTest ? route.challenge : '');
   }
 
   cleanup = launchRenderer(id, test, scene, route) || (() => {});
