@@ -1,4 +1,5 @@
-import { ORDER, TESTS } from './data/test-data.js';
+import { ORDER as BASE_ORDER, TESTS as BASE_TESTS } from './data/test-data.js';
+import { CONTENT_ORDER, CONTENT_TESTS } from './data/content-pack.js';
 import { readRoute, writeRoute, SHAREABLE_RESULT_TESTS } from './core/router.js';
 import { nextTestId, safeScene } from './core/ui.js';
 import { renderStandardResult, renderChairResult } from './core/result.js';
@@ -7,6 +8,9 @@ import { renderMbti } from './renderers/mbti.js';
 import { renderChair } from './renderers/chair.js';
 import { renderBalloon } from './renderers/balloon.js';
 import { renderCyberball } from './renderers/cyberball.js';
+
+const ORDER = [...BASE_ORDER, ...CONTENT_ORDER];
+const TESTS = { ...BASE_TESTS, ...CONTENT_TESTS };
 
 const stage = document.getElementById('stage');
 const tabs = document.getElementById('tabs');
@@ -53,7 +57,7 @@ function showDeepLinkedResult(id, test, result, scene) {
 
 function launchRenderer(id, test, scene) {
   const base = { stage, test };
-  if (test.kind === 'grid' || test.kind === 'swatch') {
+  if (test.kind === 'grid' || test.kind === 'swatch' || test.kind === 'symbol') {
     return renderGrid({ ...base, onResult: (key, image) => {
       writeRoute(id, key);
       renderStandardResult({ stage, id, test, key, image, onAgain: () => again(id), onNext: () => next(id) });
