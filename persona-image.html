@@ -254,7 +254,7 @@ cat:{t:'猫猫',name:'猫系 MBTI · 16 型',kind:'mbti',
  ESTP:['cat_bombay','ESTP · 孟买猫','先做了再说。','大胆|直接|反应快','冲动，收不住。','ESTP 孟买：后果？做了再想。'],
  ESFP:['cat_american','ESFP · 美国短毛猫','有我在就有气氛。','活泼|亲和|爱热闹','静不下来。','ESFP 美短：冷场是我的天敌。'],
  ENFP:['cat_maine','ENFP · 缅因猫','又大只又黏人，不矛盾。','热情|好奇|重感情','三分钟热度。','ENFP 缅因：我对什么都好奇，对你在意。'],
- ENTP:['cat_sphynx','ENTP · 斯芬克斯猫','规矩就是用来打破的。','机灵|善辩|不按常理','抬杠成性。','ENTP 斯芬克斯：你说不行？为什么不行？'],
+ ENTP:['cat_sphynx.svg','ENTP · 斯芬克斯猫','规矩就是用来打破的。','机灵|善辩|不按常理','抬杠成性。','ENTP 斯芬克斯：你说不行？为什么不行？'],
  ESTJ:['cat_norwegian','ESTJ · 挪威森林猫','这事儿得有人管起来。','有担当|讲效率|可靠','太爱管，显得强势。','ESTJ 挪威森林：别慌，我来安排。'],
  ESFJ:['cat_angora','ESFJ · 土耳其安哥拉猫','大家都舒服我才舒服。','优雅|体贴|重人情','太在意评价。','ESFJ 安哥拉：我把气氛照顾好，是我的本事。'],
  ENFJ:['cat_siamese','ENFJ · 暹罗猫','我有话要说，而且要说给你听。','共情|外放|会带动','操心过度。','ENFJ 暹罗：我不是话多，我是怕你不懂我。'],
@@ -620,7 +620,7 @@ function cbFin(){
 function showResult(id,k,img,stats){
   var d=DATA[id],r=d.results[k];if(!r)return;
   var hasImg=r.length>=6;
-  var src=(img||(hasImg?'img/'+r[0]+'.jpg':''));
+  var src=(img||(hasImg?'img/'+r[0]+(String(r[0]).indexOf('.')>=0?'':'.jpg'):''));
   var n=hasImg?1:0;
   stage.innerHTML='<div class="result">'+
     '<div class="rtype">你的结果 · '+esc(d.name)+'</div>'+

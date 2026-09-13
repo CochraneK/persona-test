@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Persona Test">
+  <rect width="512" height="512" rx="112" fill="#142A40"/>
+  <circle cx="256" cy="210" r="122" fill="#24A69E"/>
+  <circle cx="210" cy="190" r="18" fill="#fff"/>
+  <circle cx="302" cy="190" r="18" fill="#fff"/>
+  <path d="M194 260c38 46 86 46 124 0" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+  <path d="M162 362h188" stroke="#F29A49" stroke-width="28" stroke-linecap="round"/>
+</svg>
