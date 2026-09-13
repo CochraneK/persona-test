@@ -1,4 +1,4 @@
-const CACHE = 'persona-test-v3';
+const CACHE = 'persona-test-v4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,8 +6,10 @@ const APP_SHELL = [
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/app.css',
+  './assets/content-pack.css',
   './assets/app.js',
   './assets/data/test-data.js',
+  './assets/data/content-pack.js',
   './assets/core/ui.js',
   './assets/core/router.js',
   './assets/core/result.js',
