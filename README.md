@@ -6,7 +6,7 @@
 
 ## 当前版本
 
-首页已经改为面向玩家的 12 个测试入口，不再让用户先理解“图片版 / 合集版 / 单测版”的实现差异。
+首页面向玩家直接提供 12 个测试入口：
 
 - 🪑 会议室选椅子
 - 🎈 气球风险小游戏
@@ -21,14 +21,17 @@
 - 🏙️ 城市人格
 - 🌸 花系人格
 
-新的推荐入口是 [`play.html`](play.html)。它在保留现有 `persona-image.html` 测试引擎的基础上，增加了产品化与兼容性修正：
+推荐入口是 [`play.html`](play.html)。它保留现有 `persona-image.html` 作为测试引擎，并通过独立的 [`assets/play-shell.js`](assets/play-shell.js) / [`assets/play-shell.css`](assets/play-shell.css) 提供产品层增强，避免继续把功能堆进大型单文件。
+
+### 玩家体验
 
 - 手机端气球测试增加「打气 +2」按钮，也可以直接点击气球；桌面仍支持空格键。
-- 猫系 / 犬系 MBTI 修正旧版第一选项计分错误，并从每维 2 题扩展为每维 3 题（共 12 题），避免平手固定偏向某一侧。
+- 猫系 / 犬系 MBTI 修正旧版第一选项读取与计分错误，并从每维 2 题扩展为每维 3 题（共 12 题），避免平手固定偏向某一侧。
 - 椅子测试移除容易产生误导的固定座位说明，并补充键盘操作。
-- 结果页增加「复制结果」和 Web Share API 原生分享；不支持原生分享时自动退化为复制链接。
-- URL 使用 `?test=...` 保存当前测试入口，可直接分享指定测试。
-- 玩家入口隐藏内部的「平台 / 营销落点」信息；这些内容仍保留在原始图鉴页中供开发参考。
+- 结果页支持「复制结果」「分享结果」和「生成结果海报」。海报为浏览器本地生成的 PNG，不需要上传服务器。
+- 可分享的静态结果会写入 `?test=...&result=...`；椅子结果额外保存 `scene`，朋友打开链接可直接看到同一结果卡。
+- 气球 / 抛球属于过程型行为小游戏，分享链接只保留测试入口，不伪造或复现原始过程统计。
+- 玩家入口隐藏内部「平台 / 营销落点」信息；这些内容仍保留在原始图鉴页供开发参考。
 - 图片选择项启用 lazy loading / async decoding，并补充 `prefers-reduced-motion` 与 focus 状态。
 
 ## 文件说明
@@ -36,11 +39,42 @@
 | 文件 | 用途 |
 | --- | --- |
 | [`index.html`](index.html) | **推荐首页**：12 个测试直接入口，移动优先。 |
-| [`play.html`](play.html) | **推荐游玩入口**：产品壳 + 移动端、计分、分享、无障碍修正。 |
+| [`play.html`](play.html) | **推荐游玩入口**：轻量产品壳。 |
+| [`assets/play-shell.js`](assets/play-shell.js) | 移动端、计分修正、深链接、分享、结果海报、无障碍增强。 |
+| [`assets/play-shell.css`](assets/play-shell.css) | 产品壳样式。 |
 | [`persona-image.html`](persona-image.html) | 原始旗舰图鉴 / 测试引擎，含图片资源和内部参考信息。 |
 | [`persona-collection.html`](persona-collection.html) | Lite 合集：纯 emoji / SVG，零外部图片资源。 |
 | [`chair-test.html`](chair-test.html) | 独立会议室选椅子版本。 |
 | [`img/`](img/) | 图片资源。 |
+| [`scripts/check-static.mjs`](scripts/check-static.mjs) | 零依赖静态结构 / 关键功能 / 图片资产检查。 |
+| [`scripts/optimize-images.py`](scripts/optimize-images.py) | 安全 JPEG 批量压缩脚本。 |
+
+## 图片优化
+
+项目保留现有 `.jpg` 文件名和引用方式，先做低风险的体积治理，而不是立刻重写所有资源为 WebP/AVIF。
+
+[`scripts/optimize-images.py`](scripts/optimize-images.py) 会：
+
+- 仅处理 JPEG；
+- 对超大图片限制最长边；
+- 使用 progressive JPEG + optimize 重新编码；
+- 只有新文件至少小约 8% 时才替换；
+- 不修改图片文件名，因此现有测试数据无需迁移。
+
+本地预览压缩收益：
+
+```bash
+python -m pip install pillow
+python scripts/optimize-images.py
+```
+
+实际写入：
+
+```bash
+python scripts/optimize-images.py --write
+```
+
+`.github/workflows/optimize-images.yml` 会在优化脚本 / workflow / 图片进入 `main` 后自动执行一次，并只在确实产生更小图片时提交资源变更。
 
 ## 结果定位
 
@@ -58,13 +92,13 @@
 - 无账号系统
 - 无后端数据库
 - 无第三方埋点
-- 测试过程和结果默认只存在于当前浏览器页面中
+- 测试过程默认只存在于当前浏览器页面中
+- 结果海报完全在浏览器 Canvas 中生成
+- 分享 URL 只包含测试 / 静态结果标识，不包含姓名或账号信息
 
 ## 本地预览
 
 旧页面可以直接双击打开。推荐入口 `play.html` 使用同源 iframe 对旧测试引擎做增强；部分浏览器会限制 `file://` 页面之间的脚本访问，因此完整体验建议使用任意静态 HTTP server，或直接访问 GitHub Pages。
-
-例如：
 
 ```bash
 python -m http.server 8000
@@ -72,6 +106,15 @@ python -m http.server 8000
 
 然后访问 `http://localhost:8000/`。
 
-## 下一步
+## 自动检查
 
-当前改版优先修复了用户可见的硬问题。后续适合继续做：结果海报导出、图片 WebP/AVIF 压缩与重复资产巡检、把测试数据/渲染器从大型单文件中正式拆分、自动化 smoke test，以及补充代码与图片资源的许可证说明。
+GitHub Actions 会运行 `node scripts/check-static.mjs`，检查：
+
+- 12 个首页入口是否完整；
+- 产品壳模块是否存在；
+- MBTI 修复、手机气球、分享、结果海报、深链接等关键能力是否仍在；
+- 图片重复字节与异常大文件。
+
+## 后续方向
+
+下一阶段更适合做正式的数据层 / renderer 拆分，把 `persona-image.html` 中的测试数据迁到独立模块；再增加浏览器级 smoke test，以及在确认图片授权和内容正确后处理重复素材与 WebP/AVIF 双格式。
