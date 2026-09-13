@@ -14,6 +14,24 @@ async function ready(path) {
   assert.equal(await page.locator('iframe').count(), 0, 'play page must not use iframe');
 }
 
+await ready('play.html?test=room');
+assert.equal(await page.locator('#tabs button').count(), 18, 'expanded collection should expose 18 test tabs');
+assert.equal(await page.locator('.symbol-item').count(), 8, 'room test should render eight symbol choices');
+await page.locator('.symbol-item').first().click();
+await page.locator('.result').waitFor();
+assert.match(page.url(), /result=window/, 'symbol result should be deep-linkable');
+assert.match(await page.locator('.rname').innerText(), /通透换气型/, 'room result should render');
+assert.ok(await page.getByRole('button', { name: '生成结果海报' }).isVisible(), 'symbol result should support poster generation');
+
+await ready('play.html?test=room&result=window');
+assert.match(await page.locator('.rname').innerText(), /通透换气型/, 'deep-linked symbol result should restore');
+assert.equal(await page.locator('.rimg').count(), 0, 'symbol result should not require an image asset');
+
+for (const id of ['door','drink','gem','season','path']) {
+  await ready(`play.html?test=${id}`);
+  assert.equal(await page.locator('.symbol-item').count(), 8, `${id} should render eight symbol choices`);
+}
+
 await ready('play.html?test=animal');
 assert.ok(await page.locator('.eitem').count() >= 8, 'animal grid should render');
 await page.locator('.eitem').first().click();
@@ -59,6 +77,8 @@ assert.ok(await page.locator('.cv').first().isVisible(), 'normalized route shoul
 
 const manifest = await page.request.get(`${base}/manifest.webmanifest`);
 assert.equal(manifest.ok(), true, 'manifest should be served');
+const contentPack = await page.request.get(`${base}/assets/data/content-pack.js`);
+assert.equal(contentPack.ok(), true, 'content pack should be served');
 
 await browser.close();
 if (runtimeErrors.length) {
