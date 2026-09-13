@@ -10,7 +10,11 @@ function resultMeta(test, key, imageOverride = '') {
   if (!raw) return null;
   const hasImage = raw.length >= 6;
   const offset = hasImage ? 1 : 0;
-  const image = imageOverride || (hasImage ? assetUrl(raw[0]) : '');
+  let image = imageOverride || (hasImage ? assetUrl(raw[0]) : '');
+  if (!image && test.kind === 'grid') {
+    const item = (test.items || []).find((entry) => entry[2] === key);
+    if (item) image = assetUrl(item[0]);
+  }
   return {
     key,
     image,
