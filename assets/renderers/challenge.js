@@ -4,6 +4,37 @@ function validCode(code, count) {
   return new RegExp(`^[01]{${count}}$`).test(String(code || ''));
 }
 
+function config(test) {
+  return {
+    icon: '🤝',
+    inviteType: '挑战链接已生成',
+    inviteName: '轮到你的朋友了',
+    inviteLine: `你的 ${(test.questions || []).length} 个选择已经压进这个链接里，不会上传到服务器。`,
+    creatorHint: `先完成你的 ${(test.questions || []).length} 个选择，答完后会生成一个挑战链接。`,
+    partnerHint: '朋友已经先答完；现在按你自己的第一反应选。',
+    creatorProgress: '发起挑战',
+    partnerProgress: '朋友挑战',
+    statsLabel: '本轮默契',
+    shareText: `我已经答完 ${(test.questions || []).length} 题，轮到你了。`,
+    privacy: '答案只编码在当前挑战链接中；项目没有账号、数据库或答题上传接口。',
+    bands: [
+      { min: (test.questions || []).length, key: 'soulmate' },
+      { min: 4, key: 'close' },
+      { min: 2, key: 'complement' },
+      { min: 0, key: 'opposite' }
+    ],
+    ...(test.challengeConfig || {})
+  };
+}
+
+function resultKey(matches, test, cfg) {
+  const bands = [...(cfg.bands || [])].sort((a, b) => Number(b.min) - Number(a.min));
+  const hit = bands.find((band) => matches >= Number(band.min));
+  if (hit && test.results?.[hit.key]) return hit.key;
+  const first = Object.keys(test.results || {})[0];
+  return first || '';
+}
+
 async function copyText(text) {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -21,6 +52,7 @@ async function copyText(text) {
 
 export function renderChallenge({ stage, test, challengeCode = '', onInvite, onPairResult, onRestart }) {
   const questions = test.questions || [];
+  const cfg = config(test);
   const partnerMode = validCode(challengeCode, questions.length);
   const answers = [];
   let index = 0;
@@ -28,10 +60,10 @@ export function renderChallenge({ stage, test, challengeCode = '', onInvite, onP
   function renderInvite(code) {
     const card = el('section', 'challenge-invite result');
     card.setAttribute('aria-live', 'polite');
-    card.append(el('div', 'rtype', '挑战链接已生成'));
-    card.append(el('div', 'challenge-big', '🤝'));
-    card.append(el('div', 'rname', '轮到你的朋友了'));
-    card.append(el('div', 'rline', '「你的 6 个选择已经压进这个链接里，不会上传到服务器。」'));
+    card.append(el('div', 'rtype', cfg.inviteType));
+    card.append(el('div', 'challenge-big', cfg.icon));
+    card.append(el('div', 'rname', cfg.inviteName));
+    card.append(el('div', 'rline', `「${cfg.inviteLine}」`));
     const note = el('div', 'challenge-code-note', `挑战码：${code}`);
     const row = el('div', 'btnrow');
     const copy = el('button', 'btn', '复制挑战链接');
@@ -59,7 +91,7 @@ export function renderChallenge({ stage, test, challengeCode = '', onInvite, onP
         return;
       }
       try {
-        await navigator.share({ title: test.name, text: '我已经答完 6 题，轮到你了。', url: location.href });
+        await navigator.share({ title: test.name, text: cfg.shareText, url: location.href });
       } catch (error) {
         if (error?.name !== 'AbortError') status.textContent = '分享没有完成，可以改用复制链接。';
       }
@@ -79,17 +111,17 @@ export function renderChallenge({ stage, test, challengeCode = '', onInvite, onP
     }
     let matches = 0;
     for (let i = 0; i < questions.length; i++) if (code[i] === challengeCode[i]) matches += 1;
-    const key = matches === questions.length ? 'soulmate' : matches >= 4 ? 'close' : matches >= 2 ? 'complement' : 'opposite';
-    onPairResult(key, `<b>本轮默契：</b>${matches} / ${questions.length} 题相同`);
+    const key = resultKey(matches, test, cfg);
+    onPairResult(key, `<b>${cfg.statsLabel}：</b>${matches} / ${questions.length}`);
   }
 
   function renderQuestion() {
     if (index >= questions.length) return finish();
     renderTestHeader(stage, test);
-    appendHint(stage, partnerMode ? '朋友已经先答完；现在按你自己的第一反应选。' : '先完成你的 6 个选择，答完后会生成一个挑战链接。');
+    appendHint(stage, partnerMode ? cfg.partnerHint : cfg.creatorHint);
     const host = el('div', 'challenge-host');
     const [prompt, left, right] = questions[index];
-    host.append(el('div', 'prog', `${partnerMode ? '朋友挑战' : '发起挑战'} · ${index + 1} / ${questions.length}`));
+    host.append(el('div', 'prog', `${partnerMode ? cfg.partnerProgress : cfg.creatorProgress} · ${index + 1} / ${questions.length}`));
     host.append(el('div', 'qtext', prompt));
     const options = el('div', 'challenge-options');
     [[left, '0'], [right, '1']].forEach(([label, bit]) => {
@@ -102,7 +134,7 @@ export function renderChallenge({ stage, test, challengeCode = '', onInvite, onP
       }, { once: true });
       options.append(button);
     });
-    host.append(options, el('p', 'challenge-privacy', '答案只编码在当前挑战链接中；项目没有账号、数据库或答题上传接口。'));
+    host.append(options, el('p', 'challenge-privacy', cfg.privacy));
     stage.append(host);
   }
 
