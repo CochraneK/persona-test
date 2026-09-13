@@ -14,8 +14,57 @@ async function ready(path) {
   assert.equal(await page.locator('iframe').count(), 0, 'play page must not use iframe');
 }
 
+await ready('play.html?test=priority');
+assert.equal(await page.locator('#tabs button').count(), 22, 'expanded collection should expose 22 test tabs');
+assert.equal(await page.locator('.rank-option').count(), 6, 'ranking test should render six choices');
+const rankOptions = page.locator('.rank-option');
+await rankOptions.nth(0).click();
+await rankOptions.nth(1).click();
+await rankOptions.nth(2).click();
+await page.getByRole('button', { name: '查看结果' }).click();
+await page.locator('.result').waitFor();
+assert.match(page.url(), /result=freedom/, 'ranking result should deep-link the first priority');
+assert.match(await page.locator('.rstats').innerText(), /自由.*安全.*关系/, 'ranking result should preserve top-three summary for the current run');
+
+await ready('play.html?test=priority&result=freedom');
+assert.match(await page.locator('.rname').innerText(), /自由优先型/, 'ranking deep link should restore the main result');
+
+await ready('play.html?test=crossroads');
+for (let i = 0; i < 6; i++) await page.locator('.binary-option').first().click();
+await page.locator('.result').waitFor();
+assert.match(page.url(), /result=fast_plan/, 'binary choices should classify fast/plan result');
+assert.match(await page.locator('.rname').innerText(), /快速掌舵型/, 'binary result should render');
+
+await ready('play.html?test=budget');
+const plus = page.locator('.alloc-plus');
+for (let i = 0; i < 6; i++) await plus.nth(0).click();
+for (let i = 0; i < 2; i++) await plus.nth(1).click();
+for (let i = 0; i < 2; i++) await plus.nth(2).click();
+for (let i = 0; i < 2; i++) await plus.nth(3).click();
+assert.match(await page.locator('.alloc-meter').innerText(), /12 \/ 12/, 'allocation meter should reach the budget');
+await page.getByRole('button', { name: '查看分配结果' }).click();
+await page.locator('.result').waitFor();
+assert.match(page.url(), /result=self/, 'allocation should classify a clear leading bucket');
+assert.match(await page.locator('.rname').innerText(), /自我回充型/, 'allocation result should render');
+
+await ready('play.html?test=sync');
+for (let i = 0; i < 6; i++) await page.locator('.challenge-option').first().click();
+await page.locator('.challenge-invite').waitFor();
+assert.match(page.url(), /challenge=000000/, 'first player answers should be encoded into the challenge URL');
+assert.ok(await page.getByRole('button', { name: '复制挑战链接' }).isVisible(), 'challenge invitation should expose copy action');
+
+await ready('play.html?test=sync&challenge=000000');
+for (let i = 0; i < 6; i++) await page.locator('.challenge-option').first().click();
+await page.locator('.result').waitFor();
+assert.match(await page.locator('.rname').innerText(), /高同步拍档/, 'matching answers should produce the 6/6 pair result');
+assert.match(await page.locator('.rstats').innerText(), /6 \/ 6/, 'pair result should show local similarity count');
+assert.doesNotMatch(page.url(), /challenge=/, 'pair result should clear invitation answers from the URL');
+
+await ready('play.html?test=sync&challenge=010');
+assert.doesNotMatch(page.url(), /challenge=/, 'malformed challenge codes should be normalized away');
+assert.match(await page.locator('.prog').innerText(), /发起挑战/, 'invalid challenge should fall back to first-player mode');
+
 await ready('play.html?test=room');
-assert.equal(await page.locator('#tabs button').count(), 18, 'expanded collection should expose 18 test tabs');
 assert.equal(await page.locator('.symbol-item').count(), 8, 'room test should render eight symbol choices');
 await page.locator('.symbol-item').first().click();
 await page.locator('.result').waitFor();
@@ -48,9 +97,7 @@ assert.match(await page.locator('.rname').innerText(), /斯芬克斯猫/, 'ENTP 
 assert.match(await page.locator('.rimg').getAttribute('src'), /cat_sphynx\.svg$/, 'Sphynx result should use the distinct SVG asset');
 
 await ready('play.html?test=cat');
-for (let i = 0; i < 12; i++) {
-  await page.locator('.opt').first().click();
-}
+for (let i = 0; i < 12; i++) await page.locator('.opt').first().click();
 await page.locator('.result').waitFor();
 assert.match(page.url(), /result=[EISNTFJP]{4}/, 'MBTI should finish with a four-letter type');
 
@@ -69,9 +116,10 @@ assert.match(await page.locator('.pumps').innerText(), /打气 1 次|爆了/, 'p
 await ready('play.html?test=cyber');
 assert.ok(await page.locator('.cb').isVisible(), 'Cyberball board should render');
 
-await ready('play.html?test=does-not-exist&result=nope&scene=wrong');
+await ready('play.html?test=does-not-exist&result=nope&scene=wrong&challenge=000000');
 assert.match(page.url(), /test=chair/, 'invalid test id should normalize to chair');
 assert.doesNotMatch(page.url(), /result=/, 'invalid result should be removed');
+assert.doesNotMatch(page.url(), /challenge=/, 'challenge data must not leak into another test');
 assert.match(page.url(), /scene=long/, 'invalid chair scene should normalize to the default scene');
 assert.ok(await page.locator('.cv').first().isVisible(), 'normalized route should render a playable chair test');
 
@@ -79,9 +127,9 @@ const manifest = await page.request.get(`${base}/manifest.webmanifest`);
 assert.equal(manifest.ok(), true, 'manifest should be served');
 const contentPack = await page.request.get(`${base}/assets/data/content-pack.js`);
 assert.equal(contentPack.ok(), true, 'content pack should be served');
+const interactionPack = await page.request.get(`${base}/assets/data/interaction-pack.js`);
+assert.equal(interactionPack.ok(), true, 'interaction pack should be served');
 
 await browser.close();
-if (runtimeErrors.length) {
-  throw new Error(`Browser runtime errors:\n${runtimeErrors.join('\n')}`);
-}
+if (runtimeErrors.length) throw new Error(`Browser runtime errors:\n${runtimeErrors.join('\n')}`);
 console.log('Browser smoke tests passed.');
