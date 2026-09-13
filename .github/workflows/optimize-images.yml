@@ -1,0 +1,39 @@
+name: Optimize images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'img/**'
+      - 'scripts/optimize-images.py'
+      - '.github/workflows/optimize-images.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'Optimize image assets')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Recompress oversized JPEGs
+        run: python scripts/optimize-images.py --write
+      - name: Commit optimized assets
+        shell: bash
+        run: |
+          if git diff --quiet -- img; then
+            echo "No image changes needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add img
+          git commit -m "Optimize image assets [skip ci]"
+          git push
