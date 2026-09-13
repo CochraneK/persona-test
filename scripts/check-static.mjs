@@ -30,8 +30,10 @@ read('assets/core/result.js');
 read('assets/core/router.js');
 read('assets/core/ui.js');
 read('assets/renderers/grid.js');
-read('manifest.webmanifest');
-read('sw.js');
+const manifest = read('manifest.webmanifest');
+const serviceWorker = read('sw.js');
+const robots = read('robots.txt');
+const sitemap = read('sitemap.xml');
 read('README.md');
 read('scripts/extract-test-data.mjs');
 read('scripts/optimize-images.py');
@@ -45,6 +47,15 @@ for (const id of tests) {
 if (/<iframe\b/i.test(play)) errors.push('play.html must not use an iframe');
 if (!play.includes('type="module" src="assets/app.js"')) errors.push('play.html does not load the modular app entrypoint');
 if (!play.includes('manifest.webmanifest')) errors.push('play.html does not expose the web app manifest');
+if (!index.includes('manifest.webmanifest')) errors.push('index.html does not expose the web app manifest');
+if (!manifest.includes('"display": "standalone"')) errors.push('manifest is not installable standalone metadata');
+if (!serviceWorker.includes("const CACHE = 'persona-test-v3'")) errors.push('service worker cache version marker missing');
+if (!robots.includes('sitemap.xml')) errors.push('robots.txt does not advertise sitemap');
+if (!sitemap.includes('play.html?test=chair')) errors.push('sitemap missing play entrypoints');
+
+if (fs.existsSync(path.join(root, 'assets', 'play-shell.js')) || fs.existsSync(path.join(root, 'assets', 'play-shell.css'))) {
+  errors.push('obsolete iframe play-shell files still exist');
+}
 
 const requiredMarkers = [
   [app, 'serviceWorker.register', 'service worker registration'],
@@ -61,6 +72,7 @@ for (const [content, marker, label] of requiredMarkers) {
 }
 
 if (!fs.existsSync(path.join(root, 'img', 'cat_sphynx.svg'))) errors.push('missing distinct Sphynx cat asset');
+if (fs.existsSync(path.join(root, 'img', 'cat_sphynx.jpg'))) errors.push('obsolete duplicate Sphynx JPG still exists');
 
 const imgDir = path.join(root, 'img');
 if (fs.existsSync(imgDir)) {
@@ -87,4 +99,4 @@ if (errors.length) {
   for (const error of errors) console.error(`ERROR ${error}`);
   process.exit(1);
 }
-console.log(`OK: modular app and ${tests.length} test entries checked; ${warnings.length} warning(s).`);
+console.log(`OK: release-ready modular app and ${tests.length} test entries checked; ${warnings.length} warning(s).`);
