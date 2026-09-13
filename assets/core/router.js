@@ -3,6 +3,8 @@ export const SHAREABLE_RESULT_TESTS = new Set([
   'room','door','drink','gem','season','path','priority','crossroads','budget'
 ]);
 
+export const CHALLENGE_TESTS = new Set(['sync','guessme','travelmate','rhythm']);
+
 function safeChallenge(value) {
   const code = String(value || '');
   return /^[01]{6}$/.test(code) ? code : '';
@@ -27,7 +29,7 @@ export function writeRoute(test, result = '', scene = '', mode = 'replace', chal
   else url.searchParams.delete('result');
   if (test === 'chair' && scene) url.searchParams.set('scene', scene);
   else url.searchParams.delete('scene');
-  const code = test === 'sync' ? safeChallenge(challenge) : '';
+  const code = CHALLENGE_TESTS.has(test) ? safeChallenge(challenge) : '';
   if (code) url.searchParams.set('challenge', code);
   else url.searchParams.delete('challenge');
   const next = url.pathname + url.search + url.hash;
