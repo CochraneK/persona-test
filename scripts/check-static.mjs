@@ -3,7 +3,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = path.resolve(process.cwd());
-const tests = ['chair','balloon','cyber','dog','cat','audio','animal','food','color','weather','city','flower'];
+const baseTests = ['chair','balloon','cyber','dog','cat','audio','animal','food','color','weather','city','flower'];
+const contentTests = ['room','door','drink','gem','season','path'];
+const tests = [...baseTests, ...contentTests];
 const errors = [];
 const warnings = [];
 
@@ -20,16 +22,18 @@ const index = read('index.html');
 const play = read('play.html');
 const app = read('assets/app.js');
 const data = read('assets/data/test-data.js');
+const content = read('assets/data/content-pack.js');
 const share = read('assets/core/share.js');
+const router = read('assets/core/router.js');
 const balloon = read('assets/renderers/balloon.js');
 const chair = read('assets/renderers/chair.js');
 const mbti = read('assets/renderers/mbti.js');
 const cyber = read('assets/renderers/cyberball.js');
+const grid = read('assets/renderers/grid.js');
 read('assets/app.css');
+read('assets/content-pack.css');
 read('assets/core/result.js');
-read('assets/core/router.js');
 read('assets/core/ui.js');
-read('assets/renderers/grid.js');
 const manifest = read('manifest.webmanifest');
 const serviceWorker = read('sw.js');
 const robots = read('robots.txt');
@@ -41,25 +45,37 @@ read('tests/smoke.mjs');
 
 for (const id of tests) {
   if (!index.includes(`play.html?test=${id}`)) errors.push(`homepage missing test link: ${id}`);
-  if (!data.includes(`"${id}"`)) errors.push(`generated data missing test: ${id}`);
+  if (!sitemap.includes(`play.html?test=${id}`)) errors.push(`sitemap missing test link: ${id}`);
+}
+for (const id of baseTests) {
+  if (!data.includes(`\"${id}\"`)) errors.push(`generated data missing base test: ${id}`);
+}
+for (const id of contentTests) {
+  if (!content.includes(`  ${id}: {`)) errors.push(`content pack missing test: ${id}`);
+  if (!router.includes(`'${id}'`)) errors.push(`shareable routes missing content test: ${id}`);
 }
 
 if (/<iframe\b/i.test(play)) errors.push('play.html must not use an iframe');
 if (!play.includes('type="module" src="assets/app.js"')) errors.push('play.html does not load the modular app entrypoint');
+if (!play.includes('assets/content-pack.css')) errors.push('play.html does not load content pack styles');
 if (!play.includes('manifest.webmanifest')) errors.push('play.html does not expose the web app manifest');
 if (!index.includes('manifest.webmanifest')) errors.push('index.html does not expose the web app manifest');
 if (!manifest.includes('"display": "standalone"')) errors.push('manifest is not installable standalone metadata');
-if (!serviceWorker.includes("const CACHE = 'persona-test-v3'")) errors.push('service worker cache version marker missing');
+if (!manifest.includes('18 个轻量')) errors.push('manifest description is stale');
+if (!serviceWorker.includes("const CACHE = 'persona-test-v4'")) errors.push('service worker cache version marker missing');
+if (!serviceWorker.includes("'./assets/data/content-pack.js'")) errors.push('service worker does not cache content pack data');
+if (!serviceWorker.includes("'./assets/content-pack.css'")) errors.push('service worker does not cache content pack styles');
 if (!robots.includes('sitemap.xml')) errors.push('robots.txt does not advertise sitemap');
-if (!sitemap.includes('play.html?test=chair')) errors.push('sitemap missing play entrypoints');
 
 if (fs.existsSync(path.join(root, 'assets', 'play-shell.js')) || fs.existsSync(path.join(root, 'assets', 'play-shell.css'))) {
   errors.push('obsolete iframe play-shell files still exist');
 }
 
 const requiredMarkers = [
+  [app, 'CONTENT_ORDER', 'content pack order merge'],
   [app, 'serviceWorker.register', 'service worker registration'],
   [app, 'showDeepLinkedResult', 'deep-linked results'],
+  [grid, "test.kind === 'symbol'", 'symbol renderer support'],
   [share, 'makePoster', 'poster generation'],
   [share, 'navigator.share', 'native sharing'],
   [balloon, "'打气 +2'", 'mobile balloon pump'],
@@ -67,9 +83,14 @@ const requiredMarkers = [
   [mbti, 'state.score[option.value]++', 'normalized MBTI scoring'],
   [cyber, "ask(['A','B','C']", 'Cyberball choice phase']
 ];
-for (const [content, marker, label] of requiredMarkers) {
-  if (!content.includes(marker)) errors.push(`missing ${label}: ${marker}`);
+for (const [source, marker, label] of requiredMarkers) {
+  if (!source.includes(marker)) errors.push(`missing ${label}: ${marker}`);
 }
+
+const contentResultBlocks = (content.match(/results:\s*\{/g) || []).length;
+if (contentResultBlocks !== contentTests.length) errors.push(`content pack should have ${contentTests.length} result maps, found ${contentResultBlocks}`);
+const symbolKinds = (content.match(/kind:\s*'symbol'/g) || []).length;
+if (symbolKinds !== contentTests.length) errors.push(`content pack should have ${contentTests.length} symbol tests, found ${symbolKinds}`);
 
 if (!fs.existsSync(path.join(root, 'img', 'cat_sphynx.svg'))) errors.push('missing distinct Sphynx cat asset');
 if (fs.existsSync(path.join(root, 'img', 'cat_sphynx.jpg'))) errors.push('obsolete duplicate Sphynx JPG still exists');
