@@ -10,11 +10,13 @@ function safeChallenge(value) {
 
 export function readRoute() {
   const p = new URLSearchParams(location.search);
+  const rawChallenge = p.get('challenge') || '';
   return {
     test: p.get('test') || 'chair',
     result: p.get('result') || '',
     scene: p.get('scene') || '',
-    challenge: safeChallenge(p.get('challenge'))
+    challenge: safeChallenge(rawChallenge),
+    invalidChallenge: Boolean(rawChallenge) && !safeChallenge(rawChallenge)
   };
 }
 
