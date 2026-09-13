@@ -1,4 +1,4 @@
-const CACHE = 'persona-test-v4';
+const CACHE = 'persona-test-v5';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,9 +7,11 @@ const APP_SHELL = [
   './assets/icon.svg',
   './assets/app.css',
   './assets/content-pack.css',
+  './assets/interaction-pack.css',
   './assets/app.js',
   './assets/data/test-data.js',
   './assets/data/content-pack.js',
+  './assets/data/interaction-pack.js',
   './assets/core/ui.js',
   './assets/core/router.js',
   './assets/core/result.js',
@@ -18,7 +20,11 @@ const APP_SHELL = [
   './assets/renderers/mbti.js',
   './assets/renderers/chair.js',
   './assets/renderers/balloon.js',
-  './assets/renderers/cyberball.js'
+  './assets/renderers/cyberball.js',
+  './assets/renderers/rank.js',
+  './assets/renderers/binary.js',
+  './assets/renderers/allocate.js',
+  './assets/renderers/challenge.js'
 ];
 
 self.addEventListener('install', (event) => {
