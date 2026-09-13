@@ -1,5 +1,6 @@
 export const SHAREABLE_RESULT_TESTS = new Set([
-  'chair','dog','cat','audio','animal','food','color','weather','city','flower'
+  'chair','dog','cat','audio','animal','food','color','weather','city','flower',
+  'room','door','drink','gem','season','path'
 ]);
 
 export function readRoute() {
