@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="人格投射测验：12 个轻量、可玩、可分享的趣味人格小游戏。">
+<meta name="theme-color" content="#142A40">
+<title>Persona Test · 人格投射测验</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{width:100%;height:100%;margin:0;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  #app{display:block;width:100%;height:100%;border:0;background:#fff}
+  .shell-nav{position:fixed;right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));z-index:9999;display:flex;gap:8px;pointer-events:none}
+  .shell-nav a{pointer-events:auto;text-decoration:none;color:#142A40;background:rgba(255,255,255,.94);border:1px solid #DCE8E8;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:700;box-shadow:0 5px 20px rgba(20,42,64,.09);backdrop-filter:blur(8px)}
+  .shell-nav a:hover{border-color:#24A69E;color:#1c857d}
+  .fallback{display:none;max-width:640px;margin:15vh auto;padding:28px;color:#142A40;line-height:1.7}
+  @media (max-width:640px){.shell-nav{top:auto;bottom:max(12px,env(safe-area-inset-bottom))}.shell-nav a{padding:8px 12px}}
+</style>
+</head>
+<body>
+<nav class="shell-nav" aria-label="页面导航"><a href="index.html">← 全部测验</a></nav>
+<iframe id="app" src="persona-image.html" title="人格投射测验"></iframe>
+<div class="fallback" id="fallback"><h1>人格投射测验</h1><p>当前浏览器阻止了本地页面之间的访问。请通过 GitHub Pages 在线版本打开，或直接打开 <a href="persona-image.html">旗舰测试页</a>。</p></div>
+<script>
+(function(){
+  'use strict';
+  var frame=document.getElementById('app');
+  var fallback=document.getElementById('fallback');
+
+  function selectedTest(){
+    var p=new URLSearchParams(location.search);
+    return p.get('test')||'chair';
+  }
+
+  function updateUrl(id){
+    var u=new URL(location.href);
+    u.searchParams.set('test',id);
+    history.replaceState(null,'',u.pathname+u.search+u.hash);
+  }
+
+  function addStyle(d){
+    var s=d.createElement('style');
+    s.textContent=[
+      '.refbox{display:none!important}',
+      '.btn:focus-visible,.opt:focus-visible,.eitem:focus-visible,.sitem:focus-visible,.ctab:focus-visible{outline:3px solid rgba(36,166,158,.35);outline-offset:2px}',
+      '.cv:focus-visible .cvseat,.cv:focus-visible .cvback{stroke:#24A69E;stroke-width:3}',
+      '.balloon{cursor:pointer;touch-action:manipulation}',
+      '.share-note{font-size:12px;color:#738796;margin-top:10px;min-height:18px}',
+      '@media (max-width:640px){.btnrow .btn{min-height:44px}.blrow{width:100%;justify-content:center}.blrow .btn{flex:1;max-width:180px}.stage{padding-bottom:90px!important}}',
+      '@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}'
+    ].join('\n');
+    d.head.appendChild(s);
+  }
+
+  function copyText(text){
+    if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(text);}
+    return new Promise(function(resolve,reject){
+      try{
+        var ta=document.createElement('textarea');
+        ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+        var ok=document.execCommand('copy');ta.remove();ok?resolve():reject(new Error('copy failed'));
+      }catch(e){reject(e);}
+    });
+  }
+
+  function resultText(d){
+    var r=d.querySelector('.result');
+    if(!r)return '';
+    var name=(r.querySelector('.rname')||{}).textContent||'';
+    var line=(r.querySelector('.rline')||{}).textContent||'';
+    var tags=[].map.call(r.querySelectorAll('.chip'),function(x){return x.textContent.trim();}).filter(Boolean);
+    var copy=(r.querySelector('.copy')||{}).textContent||'';
+    copy=copy.replace(/^可晒文案\s*/, '').trim();
+    var lead=copy||('我的人格测试结果：'+name);
+    var details=[name,line,tags.length?('#'+tags.join(' #')):''].filter(Boolean).join('\n');
+    return lead+'\n\n'+details+'\n\n你也来测：'+location.href;
+  }
+
+  function enhanceResult(d){
+    var result=d.querySelector('.result');
+    if(!result||result.dataset.shareReady==='1')return;
+    result.dataset.shareReady='1';
+    var row=result.querySelector('.btnrow');
+    if(!row)return;
+    var copy=d.createElement('button');
+    copy.className='btn ghost';copy.type='button';copy.textContent='复制结果';
+    var share=d.createElement('button');
+    share.className='btn ghost';share.type='button';share.textContent=(navigator.share?'分享结果':'复制分享链接');
+    var note=d.createElement('div');note.className='share-note';note.setAttribute('aria-live','polite');
+    copy.addEventListener('click',function(){
+      copyText(resultText(d)).then(function(){note.textContent='已复制结果文案';}).catch(function(){note.textContent='复制失败，请长按选择文案';});
+    });
+    share.addEventListener('click',function(){
+      var text=resultText(d);
+      if(navigator.share){
+        navigator.share({title:'Persona Test · 人格投射测验',text:text,url:location.href}).catch(function(){});
+      }else{
+        copyText(location.href).then(function(){note.textContent='已复制测试链接';}).catch(function(){note.textContent='复制失败';});
+      }
+    });
+    row.appendChild(copy);row.appendChild(share);result.appendChild(note);
+  }
+
+  function enhanceAccessibility(w,d){
+    [].forEach.call(d.querySelectorAll('.eitem img'),function(img){img.loading='lazy';img.decoding='async';});
+    [].forEach.call(d.querySelectorAll('.cv'),function(g){
+      if(g.dataset.a11y==='1')return;
+      g.dataset.a11y='1';g.setAttribute('role','button');g.setAttribute('tabindex','0');
+      g.setAttribute('aria-label','选择椅子 '+(g.dataset.id||''));
+      g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();g.click();}});
+    });
+  }
+
+  function patchMbti(w){
+    if(!w.DATA)return;
+    var extra=[
+      [['临时多出一个空闲下午？','约人出去走走','E'],['自己安静待着更舒服','I']],
+      [['碰到陌生任务？','先从已知步骤开始','S'],['先猜整体规律和可能性','N']],
+      [['朋友来找你诉苦？','先一起想解决办法','T'],['先确认对方现在的感受','F']],
+      [['明天有件重要的事？','提前安排好更安心','J'],['保留弹性到时候再看','P']]
+    ];
+    ['cat','dog'].forEach(function(id){
+      var x=w.DATA[id];if(!x||!x.qs)return;
+      if(x.qs.length===8){extra.forEach(function(q){x.qs.push(q);});}
+      x.note='12 道情境题，每个维度 3 题，凭第一反应选择；这是娱乐化 MBTI 改编，并非正式量表。';
+    });
+  }
+
+  function patchScientificNotes(w){
+    if(!w.DATA)return;
+    if(w.DATA.balloon)w.DATA.balloon.note='5 个气球的娱乐化风险决策小游戏，灵感来自 BART。每次打气可能加分，也可能爆掉；结果仅供娱乐。';
+    if(w.DATA.cyber)w.DATA.cyber.note='一个受 Cyberball 启发的社会反应小游戏：经历被冷落后，看你接下来更倾向怎样分配互动。结果仅供娱乐。';
+  }
+
+  function patchBalloon(w,d){
+    if(!w.renderBalloon||w.__mobileBalloonPatched)return;
+    w.__mobileBalloonPatched=true;
+    var original=w.renderBalloon;
+    w.renderBalloon=function(id){
+      original(id);
+      var row=d.querySelector('.blrow');
+      if(row&&!d.getElementById('pump')){
+        var pump=d.createElement('button');pump.className='btn';pump.id='pump';pump.type='button';pump.textContent='打气 +2';
+        row.insertBefore(pump,row.firstChild);pump.onclick=function(){w.blPump();};
+      }
+      var balloon=d.getElementById('bl');
+      if(balloon){balloon.setAttribute('role','button');balloon.setAttribute('tabindex','0');balloon.setAttribute('aria-label','给气球打气');balloon.onclick=function(){var p=d.getElementById('pump');if(p&&!p.disabled)w.blPump();};balloon.onkeydown=function(e){if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();var p=d.getElementById('pump');if(p&&!p.disabled)w.blPump();}};}
+      var hint=d.querySelector('.bl .hint');if(hint)hint.innerHTML='手机点 <b>打气 +2</b> 或直接点气球；桌面也可按 <b>空格键</b>';
+    };
+    if(w.blLock){
+      var lock=w.blLock;
+      w.blLock=function(v){lock(v);var p=d.getElementById('pump');if(p)p.disabled=v;};
+    }
+  }
+
+  function patchChair(w,d){
+    if(!w.renderChair||w.__chairHintPatched)return;
+    w.__chairHintPatched=true;
+    var original=w.renderChair;
+    w.renderChair=function(id){
+      original(id);
+      var hint=d.querySelector('.stage>.hint');
+      if(hint)hint.textContent='凭第一反应点一把椅子坐下。位置只用于娱乐化投射解读，没有标准答案。';
+      enhanceAccessibility(w,d);
+    };
+  }
+
+  function patchResults(w,d){
+    if(w.__resultSharePatched)return;w.__resultSharePatched=true;
+    if(w.showResult){var sr=w.showResult;w.showResult=function(){sr.apply(w,arguments);enhanceResult(d);enhanceAccessibility(w,d);};}
+    if(w.showChairResult){var sc=w.showChairResult;w.showChairResult=function(){sc.apply(w,arguments);enhanceResult(d);enhanceAccessibility(w,d);};}
+  }
+
+  function patchNavigation(w,d){
+    if(!w.go||w.__navPatched)return;w.__navPatched=true;
+    var original=w.go;
+    w.go=function(id){
+      original(id);updateUrl(id);
+      setTimeout(function(){enhanceAccessibility(w,d);},0);
+    };
+  }
+
+  function patchHeader(d){
+    var kicker=d.querySelector('.hero .kicker');if(kicker)kicker.textContent='PERSONA TEST';
+    var h1=d.querySelector('.hero h1');if(h1)h1.textContent='人格投射测验';
+    var sub=d.querySelector('.hero .sub');if(sub)sub.textContent='12 个轻量、可玩、可分享的趣味人格小游戏。凭第一反应选择即可，所有结果仅供娱乐与交流。';
+  }
+
+  frame.addEventListener('load',function(){
+    try{
+      var w=frame.contentWindow,d=frame.contentDocument;
+      if(!w||!d||!w.DATA||!w.go)throw new Error('engine unavailable');
+      if(w.__personaShellReady)return;
+      w.__personaShellReady=true;
+      addStyle(d);patchHeader(d);patchMbti(w);patchScientificNotes(w);patchBalloon(w,d);patchChair(w,d);patchResults(w,d);patchNavigation(w,d);
+      var id=selectedTest();if(!w.DATA[id])id='chair';w.go(id);enhanceAccessibility(w,d);
+    }catch(e){
+      frame.style.display='none';fallback.style.display='block';
+    }
+  });
+})();
+</script>
+</body>
+</html>
