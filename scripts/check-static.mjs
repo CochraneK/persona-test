@@ -5,7 +5,8 @@ import crypto from 'node:crypto';
 const root = path.resolve(process.cwd());
 const baseTests = ['chair','balloon','cyber','dog','cat','audio','animal','food','color','weather','city','flower'];
 const contentTests = ['room','door','drink','gem','season','path'];
-const interactionTests = ['priority','crossroads','budget','sync'];
+const interactionTests = ['priority','crossroads','budget','selffuture','sync','guessme','travelmate','rhythm'];
+const challengeTests = ['sync','guessme','travelmate','rhythm'];
 const tests = [...baseTests, ...contentTests, ...interactionTests];
 const errors = [];
 const warnings = [];
@@ -36,6 +37,7 @@ const rank = read('assets/renderers/rank.js');
 const binary = read('assets/renderers/binary.js');
 const allocate = read('assets/renderers/allocate.js');
 const challenge = read('assets/renderers/challenge.js');
+const mirror = read('assets/renderers/mirror.js');
 read('assets/app.css');
 read('assets/content-pack.css');
 read('assets/interaction-pack.css');
@@ -67,19 +69,22 @@ for (const id of interactionTests) {
 for (const id of ['priority','crossroads','budget']) {
   if (!router.includes(`'${id}'`)) errors.push(`shareable routes missing interaction result: ${id}`);
 }
+for (const id of challengeTests) {
+  if (!router.includes(`'${id}'`)) errors.push(`challenge route allowlist missing: ${id}`);
+}
 
 if (/<iframe\b/i.test(play)) errors.push('play.html must not use an iframe');
 if (!play.includes('type="module" src="assets/app.js"')) errors.push('play.html does not load the modular app entrypoint');
 if (!play.includes('assets/content-pack.css')) errors.push('play.html does not load content pack styles');
 if (!play.includes('assets/interaction-pack.css')) errors.push('play.html does not load interaction pack styles');
-if (!play.includes('manifest.webmanifest')) errors.push('play.html does not expose the web app manifest');
-if (!index.includes('manifest.webmanifest')) errors.push('index.html does not expose the web app manifest');
+if (!play.includes('26 个轻量')) errors.push('play page count is stale');
+if (!index.includes('26 个测验')) errors.push('homepage count is stale');
 if (!manifest.includes('"display": "standalone"')) errors.push('manifest is not installable standalone metadata');
-if (!manifest.includes('22 个轻量')) errors.push('manifest description is stale');
-if (!serviceWorker.includes("const CACHE = 'persona-test-v5'")) errors.push('service worker cache version marker missing');
+if (!manifest.includes('26 个轻量')) errors.push('manifest description is stale');
+if (!serviceWorker.includes("const CACHE = 'persona-test-v6'")) errors.push('service worker cache version marker missing');
 for (const cached of [
   './assets/data/content-pack.js','./assets/data/interaction-pack.js','./assets/content-pack.css','./assets/interaction-pack.css',
-  './assets/renderers/rank.js','./assets/renderers/binary.js','./assets/renderers/allocate.js','./assets/renderers/challenge.js'
+  './assets/renderers/rank.js','./assets/renderers/binary.js','./assets/renderers/allocate.js','./assets/renderers/challenge.js','./assets/renderers/mirror.js'
 ]) {
   if (!serviceWorker.includes(`'${cached}'`)) errors.push(`service worker missing cached asset: ${cached}`);
 }
@@ -96,14 +101,19 @@ const requiredMarkers = [
   [app, 'renderBinary', 'binary renderer registration'],
   [app, 'renderAllocate', 'allocation renderer registration'],
   [app, 'renderChallenge', 'challenge renderer registration'],
+  [app, 'renderMirror', 'self-comparison renderer registration'],
+  [app, 'CHALLENGE_TESTS.has(id)', 'generic challenge route handling'],
   [app, 'serviceWorker.register', 'service worker registration'],
-  [app, 'showDeepLinkedResult', 'deep-linked results'],
   [grid, "test.kind === 'symbol'", 'symbol renderer support'],
   [rank, 'selected.length !== 3', 'three-item ranking flow'],
   [binary, "`${pace}_${control}`", 'binary result classification'],
   [allocate, "'balance'", 'allocation balance classification'],
+  [challenge, 'challengeConfig', 'per-test challenge copy/config'],
+  [challenge, 'resultKey(matches', 'generic challenge scoring bands'],
   [challenge, 'navigator.share', 'challenge native sharing'],
-  [challenge, 'challengeCode', 'challenge-code comparison'],
+  [mirror, 'passLabels', 'two-pass self comparison'],
+  [mirror, '方向一致', 'self comparison stats'],
+  [router, 'CHALLENGE_TESTS', 'challenge route allowlist'],
   [router, 'invalidChallenge', 'malformed challenge cleanup'],
   [share, 'makePoster', 'poster generation'],
   [share, 'navigator.share', 'native result sharing'],
@@ -122,8 +132,12 @@ const symbolKinds = (content.match(/kind:\s*'symbol'/g) || []).length;
 if (symbolKinds !== contentTests.length) errors.push(`content pack should have ${contentTests.length} symbol tests, found ${symbolKinds}`);
 const interactionResultBlocks = (interaction.match(/results:\s*\{/g) || []).length;
 if (interactionResultBlocks !== interactionTests.length) errors.push(`interaction pack should have ${interactionTests.length} result maps, found ${interactionResultBlocks}`);
-for (const kind of ['rank','binary','allocate','challenge']) {
+if ((interaction.match(/kind:\s*'challenge'/g) || []).length !== challengeTests.length) errors.push(`interaction pack should have ${challengeTests.length} challenge tests`);
+for (const kind of ['rank','binary','allocate','mirror','challenge']) {
   if (!interaction.includes(`kind: '${kind}'`)) errors.push(`interaction pack missing ${kind} test kind`);
+}
+for (const marker of ['好友读心','旅行搭子','关系节奏','现在的我 vs 理想的我']) {
+  if (!index.includes(marker) && !interaction.includes(marker)) errors.push(`missing social content marker: ${marker}`);
 }
 
 if (!fs.existsSync(path.join(root, 'img', 'cat_sphynx.svg'))) errors.push('missing distinct Sphynx cat asset');
