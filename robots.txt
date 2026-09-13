@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cochranek.github.io/persona-test/sitemap.xml
