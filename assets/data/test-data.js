@@ -979,7 +979,7 @@ export const TESTS = {
         "ENFP 缅因：我对什么都好奇，对你在意。"
       ],
       "ENTP": [
-        "cat_sphynx",
+        "cat_sphynx.svg",
         "ENTP · 斯芬克斯猫",
         "规矩就是用来打破的。",
         "机灵|善辩|不按常理",
