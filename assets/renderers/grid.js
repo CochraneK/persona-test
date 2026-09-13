@@ -5,11 +5,12 @@ export function renderGrid({ stage, test, onResult }) {
   appendHint(stage, '凭第一反应点一个，没有标准答案。');
 
   const isSwatch = test.kind === 'swatch';
+  const isSymbol = test.kind === 'symbol';
   const grid = el('div', isSwatch ? 'sgrid' : 'egrid');
 
   for (const item of test.items || []) {
     const [visual, label, key] = item;
-    const button = el('button', isSwatch ? 'sitem' : 'eitem');
+    const button = el('button', isSwatch ? 'sitem' : `eitem${isSymbol ? ' symbol-item' : ''}`);
     button.type = 'button';
     button.dataset.key = key;
     button.setAttribute('aria-label', label);
@@ -17,6 +18,8 @@ export function renderGrid({ stage, test, onResult }) {
     if (isSwatch) {
       button.style.background = visual;
       button.append(el('span', 'nm', label));
+    } else if (isSymbol) {
+      button.append(el('span', 'symbol-visual', visual), el('span', 'nm', label));
     } else {
       const img = el('img');
       img.src = assetUrl(visual);
@@ -28,7 +31,7 @@ export function renderGrid({ stage, test, onResult }) {
 
     button.addEventListener('click', () => {
       grid.querySelectorAll('button').forEach((x) => x.classList.toggle('sel', x === button));
-      const image = isSwatch ? '' : assetUrl(visual);
+      const image = isSwatch || isSymbol ? '' : assetUrl(visual);
       setTimeout(() => onResult(key, image), 120);
     }, { once: true });
     grid.append(button);
