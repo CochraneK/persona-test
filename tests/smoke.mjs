@@ -8,11 +8,16 @@ const runtimeErrors = [];
 page.on('pageerror', (error) => runtimeErrors.push(String(error)));
 page.on('console', (message) => { if (message.type() === 'error') runtimeErrors.push(message.text()); });
 
-await page.route('https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.min.js', async (route) => {
-  await route.fulfill({
-    contentType: 'application/javascript',
-    body: "window.qrcode=function(){return{addData:function(){},make:function(){},createSvgTag:function(){return '<svg data-test=\"qr\" viewBox=\"0 0 10 10\"><rect width=\"10\" height=\"10\"/></svg>';}}};"
-  });
+await page.addInitScript(() => {
+  window.qrcode = function qrcodeFixture() {
+    return {
+      addData() {},
+      make() {},
+      createSvgTag() {
+        return '<svg data-test="qr" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>';
+      }
+    };
+  };
 });
 
 async function ready(path) {
@@ -122,7 +127,7 @@ assert.match(await page.locator('.friend-invite').innerText(), /朋友点名你�
 assert.doesNotMatch(page.url(), /from=friend/, 'friend source marker should be consumed from the clean URL');
 
 await page.goto(`${base}/index.html`, { waitUntil: 'networkidle' });
-assert.ok(await page.getByText('随机来一个').isVisible(), 'homepage should expose random test entry');
+assert.ok(await page.getByText('🎲 随机来一个', { exact: true }).isVisible(), 'homepage should expose random test entry');
 await page.locator('.recent-section').waitFor();
 assert.match(await page.locator('.recent-section').innerText(), /房间人格/, 'homepage should show locally recent test');
 assert.match(await page.locator('.recent-section').innerText(), /只保存在这台设备/, 'recent section should state local-only storage');
