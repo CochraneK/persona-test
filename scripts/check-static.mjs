@@ -24,8 +24,8 @@ const index = read('index.html');
 const play = read('play.html');
 const app = read('assets/app.js');
 const home = read('assets/home.js');
-const homeCss = read('assets/home.css');
-const growthCss = read('assets/growth.css');
+read('assets/home.css');
+read('assets/growth.css');
 const data = read('assets/data/test-data.js');
 const content = read('assets/data/content-pack.js');
 const interaction = read('assets/data/interaction-pack.js');
@@ -54,7 +54,10 @@ const sitemap = read('sitemap.xml');
 const readme = read('README.md');
 read('scripts/extract-test-data.mjs');
 read('scripts/optimize-images.py');
-const smoke = read('tests/smoke.mjs');
+read('tests/smoke.mjs');
+const growthResultSmoke = read('tests/growth-result.mjs');
+const growthLandingSmoke = read('tests/growth-landing.mjs');
+const growthHomeSmoke = read('tests/growth-home.mjs');
 
 for (const id of tests) {
   if (!index.includes(`play.html?test=${id}`)) errors.push(`homepage missing test link: ${id}`);
@@ -128,8 +131,9 @@ const requiredMarkers = [
   [chair, 'role="button"', 'keyboard-accessible chairs'],
   [mbti, 'state.score[option.value]++', 'normalized MBTI scoring'],
   [cyber, "ask(['A','B','C']", 'Cyberball choice phase'],
-  [smoke, 'friend-invite', 'browser friend landing regression'],
-  [smoke, 'recent-section', 'browser recent-history regression']
+  [growthResultSmoke, 'inviteUrl', 'result sharing growth regression'],
+  [growthLandingSmoke, 'friend-invite', 'friend landing regression'],
+  [growthHomeSmoke, 'recent-section', 'recent-history regression']
 ];
 for (const [source, marker, label] of requiredMarkers) if (!source.includes(marker)) errors.push(`missing ${label}: ${marker}`);
 
