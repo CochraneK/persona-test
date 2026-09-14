@@ -1,5 +1,8 @@
 import { el } from './ui.js';
-import { shareUrl } from './router.js';
+import { shareUrl, inviteUrl } from './router.js';
+
+const QR_LIB = 'https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.min.js';
+let qrPromise = null;
 
 function copyText(text) {
   if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
@@ -28,6 +31,11 @@ function resultText(meta) {
     meta.tags?.length ? `#${meta.tags.join(' #')}` : ''
   ].filter(Boolean).join('\n');
   return `${lead}\n\n${details}\n\n你也来测：${shareUrl()}`;
+}
+
+function inviteText(meta) {
+  const title = meta.testName || '这个人格测试';
+  return `我刚做了「${title}」，结果是「${meta.name}」。轮到你了，看看我们会不会撞结果 👀`;
 }
 
 function roundedRect(ctx, x, y, w, h, r) {
@@ -199,6 +207,47 @@ async function savePoster(meta, note) {
   }
 }
 
+function loadQrLibrary() {
+  if (window.qrcode) return Promise.resolve(window.qrcode);
+  if (qrPromise) return qrPromise;
+  qrPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = QR_LIB;
+    script.async = true;
+    script.referrerPolicy = 'no-referrer';
+    script.onload = () => window.qrcode ? resolve(window.qrcode) : reject(new Error('QR library unavailable'));
+    script.onerror = () => reject(new Error('QR library failed to load'));
+    document.head.append(script);
+  });
+  return qrPromise;
+}
+
+async function toggleQr(card, meta, note) {
+  const existing = card.querySelector('.invite-qr');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+  const panel = el('div', 'invite-qr');
+  panel.append(el('b', '', '扫码继续这个测试'));
+  panel.append(el('p', '', '二维码只包含测试入口，不包含你的具体结果。'));
+  const target = el('div', 'invite-qr-code');
+  target.textContent = '正在生成二维码…';
+  panel.append(target);
+  card.append(panel);
+  try {
+    const qrcode = await loadQrLibrary();
+    const qr = qrcode(0, 'M');
+    qr.addData(inviteUrl(meta.testId));
+    qr.make();
+    target.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 14, scalable: true });
+    note.textContent = '二维码已在本机生成';
+  } catch {
+    target.textContent = '二维码组件加载失败，可直接使用“挑战好友”复制邀请链接。';
+    note.textContent = '二维码暂不可用';
+  }
+}
+
 export function installShareActions(card, meta) {
   const row = card.querySelector('.btnrow');
   if (!row || card.dataset.shareReady === '1') return;
@@ -208,6 +257,10 @@ export function installShareActions(card, meta) {
   copy.type = 'button';
   const share = el('button', 'btn ghost', navigator.share ? '分享结果' : '复制分享链接');
   share.type = 'button';
+  const friend = el('button', 'btn invite-btn', '挑战好友');
+  friend.type = 'button';
+  const qr = el('button', 'btn ghost qr-btn', '邀请二维码');
+  qr.type = 'button';
   const poster = el('button', 'btn ghost poster-btn', '生成结果海报');
   poster.type = 'button';
   const note = el('div', 'share-note');
@@ -236,7 +289,26 @@ export function installShareActions(card, meta) {
     }
   });
 
+  friend.addEventListener('click', async () => {
+    const url = inviteUrl(meta.testId);
+    const text = inviteText(meta);
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `来测「${meta.testName || 'Persona Test'}」`, text, url });
+        note.textContent = '好友邀请已发起';
+      } catch {}
+      return;
+    }
+    try {
+      await copyText(`${text}\n${url}`);
+      note.textContent = '已复制好友邀请';
+    } catch {
+      note.textContent = '复制邀请失败';
+    }
+  });
+
+  qr.addEventListener('click', () => toggleQr(card, meta, note));
   poster.addEventListener('click', () => savePoster(meta, note));
-  row.append(copy, share, poster);
+  row.append(friend, qr, copy, share, poster);
   card.append(note);
 }
