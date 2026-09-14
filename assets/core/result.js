@@ -78,6 +78,8 @@ export function renderStandardResult({ stage, id, test, key, image = '', stats =
   stage.replaceChildren(card);
 
   installShareActions(card, {
+    testId: id,
+    testName: test.name,
     type: `你的结果 · ${test.name}`,
     name: meta.name,
     line: meta.line,
@@ -144,6 +146,8 @@ export function renderChairResult({ stage, test, seatId, scene, onAgain, onNext 
   });
 
   installShareActions(card, {
+    testId: 'chair',
+    testName: test.name,
     type,
     name: result.name,
     line: result.quote,

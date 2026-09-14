@@ -26,6 +26,9 @@ jobs:
           node --check scripts/check-static.mjs
           node --check scripts/extract-test-data.mjs
           node --check tests/smoke.mjs
+          node --check tests/growth-result.mjs
+          node --check tests/growth-landing.mjs
+          node --check tests/growth-home.mjs
       - name: Check Python syntax
         run: python -m py_compile scripts/optimize-images.py
       - name: Verify generated test data is current
@@ -60,5 +63,11 @@ jobs:
           done
           cat /tmp/persona-http.log
           exit 1
-      - name: Run browser smoke tests
+      - name: Run core browser smoke
         run: node tests/smoke.mjs
+      - name: Run result sharing growth smoke
+        run: node tests/growth-result.mjs
+      - name: Run friend landing growth smoke
+        run: node tests/growth-landing.mjs
+      - name: Run homepage growth smoke
+        run: node tests/growth-home.mjs

@@ -1,10 +1,13 @@
-const CACHE = 'persona-test-v6';
+const CACHE = 'persona-test-v7';
 const APP_SHELL = [
   './',
   './index.html',
   './play.html',
   './manifest.webmanifest',
   './assets/icon.svg',
+  './assets/home.css',
+  './assets/growth.css',
+  './assets/home.js',
   './assets/app.css',
   './assets/content-pack.css',
   './assets/interaction-pack.css',
@@ -16,6 +19,7 @@ const APP_SHELL = [
   './assets/core/router.js',
   './assets/core/result.js',
   './assets/core/share.js',
+  './assets/core/history.js',
   './assets/renderers/grid.js',
   './assets/renderers/mbti.js',
   './assets/renderers/chair.js',

@@ -2,7 +2,8 @@ import { ORDER as BASE_ORDER, TESTS as BASE_TESTS } from './data/test-data.js';
 import { CONTENT_ORDER, CONTENT_TESTS } from './data/content-pack.js';
 import { INTERACTION_ORDER, INTERACTION_TESTS } from './data/interaction-pack.js';
 import { readRoute, writeRoute, SHAREABLE_RESULT_TESTS, CHALLENGE_TESTS } from './core/router.js';
-import { nextTestId, safeScene } from './core/ui.js';
+import { nextTestId, safeScene, el } from './core/ui.js';
+import { rememberTest } from './core/history.js';
 import { renderStandardResult, renderChairResult } from './core/result.js';
 import { renderGrid } from './renderers/grid.js';
 import { renderMbti } from './renderers/mbti.js';
@@ -42,6 +43,16 @@ function setActiveTab(id) {
     button.classList.toggle('on', active);
     button.setAttribute('aria-current', active ? 'page' : 'false');
   });
+}
+
+function showFriendInvite(test, source) {
+  document.querySelector('.friend-invite')?.remove();
+  if (source !== 'friend') return;
+  const banner = el('aside', 'friend-invite');
+  banner.setAttribute('role', 'status');
+  banner.append(el('b', '', '朋友点名你来测'));
+  banner.append(document.createTextNode(`「${test.name}」已经发到你手上。按第一反应做完，再把结果发回去。`));
+  stage.before(banner);
 }
 
 function showDeepLinkedResult(id, test, result, scene) {
@@ -157,8 +168,10 @@ export function go(requestedId, options = {}) {
   currentId = id;
   setActiveTab(id);
   document.title = `${test.name} · Persona Test`;
+  rememberTest(id, test.name);
 
-  const route = options.route || { result: '', scene: options.scene || '', challenge: '', invalidChallenge: false };
+  const route = options.route || { result: '', scene: options.scene || '', challenge: '', invalidChallenge: false, source: '' };
+  showFriendInvite(test, route.source || '');
   const requestedScene = options.scene || route.scene || '';
   const scene = id === 'chair' ? safeScene(test, requestedScene) : '';
   const shouldWrite = options.syncRoute !== false;
@@ -169,7 +182,7 @@ export function go(requestedId, options = {}) {
 
   const restored = showDeepLinkedResult(id, test, route.result, scene);
   if (restored) {
-    if (!shouldWrite && (!requestedValid || (id === 'chair' && requestedScene !== scene) || (id !== 'chair' && requestedScene) || route.invalidChallenge || route.challenge)) {
+    if (!shouldWrite && (!requestedValid || (id === 'chair' && requestedScene !== scene) || (id !== 'chair' && requestedScene) || route.invalidChallenge || route.challenge || route.source)) {
       writeRoute(id, route.result, scene, 'replace');
     }
     scrollTop();
@@ -177,7 +190,7 @@ export function go(requestedId, options = {}) {
     return;
   }
 
-  const routeNeedsCleanup = !requestedValid || route.result || requestedScene !== scene || route.invalidChallenge || (!challengeTest && route.challenge);
+  const routeNeedsCleanup = !requestedValid || route.result || requestedScene !== scene || route.invalidChallenge || (!challengeTest && route.challenge) || route.source;
   if (!shouldWrite && routeNeedsCleanup) {
     writeRoute(id, '', scene, 'replace', challengeTest ? route.challenge : '');
   } else if (shouldWrite && route.result) {
