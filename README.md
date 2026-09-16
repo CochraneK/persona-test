@@ -1,8 +1,24 @@
-# Persona Test · 人格投射测验
+<div align="center">
 
-一组轻量、可玩、可分享的人格投射与互动小游戏。项目保持 **纯静态 HTML / CSS / JavaScript**，无需登录、无需后端、默认无埋点，可直接部署到 GitHub Pages。
+# Persona Test · 人格投射实验室
 
-在线访问：<https://cochranek.github.io/persona-test/>
+**轻量、可玩、可分享的人格投射与互动小游戏集合。**
+
+<p>
+  <img alt="Tests" src="https://img.shields.io/badge/tests-26-6C63FF">
+  <img alt="Stack" src="https://img.shields.io/badge/stack-HTML%20%C2%B7%20CSS%20%C2%B7%20JavaScript-2F80ED">
+  <img alt="Backend" src="https://img.shields.io/badge/backend-none-27AE60">
+  <img alt="Tracking" src="https://img.shields.io/badge/default%20analytics-none-F2994A">
+</p>
+
+[**在线体验**](https://cochranek.github.io/persona-test/) · [**开始游玩**](https://cochranek.github.io/persona-test/play.html)
+
+</div>
+
+项目保持 **纯静态 HTML / CSS / JavaScript**，无需登录、无需后端、默认无埋点，可直接部署到 GitHub Pages。
+
+> [!NOTE]
+> 这些玩法用于互动、投射与自我探索，不应被当作标准化心理测验、诊断或临床结论。
 
 ## 当前版本
 
